@@ -1,0 +1,31 @@
+Source: app-svc
+Section: devel
+Priority: extra
+Maintainer: Jayoun Lee <airjany@samsung.com>, Sewook Park <sewook7.park@samsung.com>, Jaeho Lee <jaeho81.lee@samsung.com>
+Build-Depends: debhelper (>= 5), libdbus-glib-1-dev, libsqlite3-dev, libx11-dev, libecore-dev, libbundle-dev, libail-0-dev, dlog-dev, libxdgmime-dev, libprivilege-control-dev, sqlite3, libaul-1-dev
+Standards-Version: 0.1.0 
+
+Package: libappsvc-dev
+Section: libs
+Architecture: any
+Depends: libappsvc-0 (= ${Source-Version}), libaul-1, libdbus-glib-1-dev, libsqlite3-dev, libbundle-dev, libail-0-dev, dlog-dev, libxdgmime-dev, sqlite3, libaul-1-dev
+Description: libappsvc dev package
+
+Package: libappsvc-0
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, sqlite3
+Description: libappsvc-0 package
+
+Package: libappsvc-dbg
+Section: debug
+Architecture: any
+Depends: libappsvc-0 (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: libappsvc dbg package 
+
+Package: appsvc-tool
+Section: libs
+Architecture: any
+Depends: libappsvc-0 (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: libappsvc-0 executable package (appsvc_test)
+
