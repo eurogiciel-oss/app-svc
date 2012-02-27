@@ -1,3 +1,11 @@
+app-svc (0.1.18-3) unstable; urgency=low
+
+  * Updated Code
+  * Git: pkgs/a/app-svc
+  * Tag: app-svc_0.1.18-3
+
+ -- Sewook Park <sewook7.park@samsung.com>  Sat, 25 Feb 2012 17:35:51 +0900
+
 app-svc (0.1.18-2) unstable; urgency=low
 
   * Initial release
