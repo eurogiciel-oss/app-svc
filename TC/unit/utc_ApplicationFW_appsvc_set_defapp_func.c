@@ -63,7 +63,7 @@ static void utc_appsvc_set_defapp_func_01(void)
 {
 	int ret = APPSVC_RET_OK;
 	ret =
-	    appsvc_set_defapp("slp.appsvc.operation.abcd12", NULL, NULL,
+	    appsvc_set_defapp("http://tizen.org/appsvc/operation/abcd12", NULL, NULL,
 			      "org.tizen.abcd12");
 	if (ret == APPSVC_RET_OK) {
 		tet_infoline("appsvc_set_defapp test PASS!");
@@ -82,7 +82,7 @@ static void utc_appsvc_set_defapp_func_01(void)
 static void utc_appsvc_set_defapp_func_02(void)
 {
 	int ret = APPSVC_RET_OK;
-	ret = appsvc_set_defapp("slp.appsvc.operation.abcd", NULL, NULL, NULL);
+	ret = appsvc_set_defapp("http://tizen.org/appsvc/operation/abcd", NULL, NULL, NULL);
 	if (ret == APPSVC_RET_EINVAL) {
 		tet_infoline("appsvc_set_defapp test PASS!");
 		tet_printf("ret = %d", ret);

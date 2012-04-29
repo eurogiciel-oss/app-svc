@@ -54,45 +54,45 @@ extern "C" {
 
 
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_DEFAULT		"slp.appsvc.operation.DEFAULT"
+#define APPSVC_OPERATION_DEFAULT		"http://tizen.org/appsvc/operation/default"
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_EDIT			"slp.appsvc.operation.EDIT"
+#define APPSVC_OPERATION_EDIT			"http://tizen.org/appsvc/operation/edit"
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_VIEW			"slp.appsvc.operation.VIEW"
+#define APPSVC_OPERATION_VIEW			"http://tizen.org/appsvc/operation/view"
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_PICK			"slp.appsvc.operation.PICK"
+#define APPSVC_OPERATION_PICK			"http://tizen.org/appsvc/operation/pick"
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_CREATE_CONTENT		"slp.appsvc.operation.CREATE_CONTENT"
+#define APPSVC_OPERATION_CREATE_CONTENT		"http://tizen.org/appsvc/operation/create_content"
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_CALL			"slp.appsvc.operation.CALL"
+#define APPSVC_OPERATION_CALL			"http://tizen.org/appsvc/operation/call"
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_SEND			"slp.appsvc.operation.SEND"
+#define APPSVC_OPERATION_SEND			"http://tizen.org/appsvc/operation/send"
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_SEND_TEXT		"slp.appsvc.operation.SEND_TEXT"
+#define APPSVC_OPERATION_SEND_TEXT		"http://tizen.org/appsvc/operation/send_text"
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_DIAL			"slp.appsvc.operation.DIAL"
+#define APPSVC_OPERATION_DIAL			"http://tizen.org/appsvc/operation/dial"
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_SEARCH			"slp.appsvc.operation.SEARCH"
+#define APPSVC_OPERATION_SEARCH			"http://tizen.org/appsvc/operation/search"
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_DOWNLOAD		"slp.appsvc.operation.DOWNLOAD"
+#define APPSVC_OPERATION_DOWNLOAD		"http://tizen.org/appsvc/operation/download"
 
 
 /** APP_SVC DATA SUBJECT*/
-#define APPSVC_DATA_SUBJECT		"slp.appsvc.data.SUBJECT"
+#define APPSVC_DATA_SUBJECT		"http://tizen.org/appsvc/data/subject"
 /** APP_SVC DATA TYPE*/
-#define APPSVC_DATA_TO			"slp.appsvc.data.TO"
+#define APPSVC_DATA_TO			"http://tizen.org/appsvc/data/to"
 /** APP_SVC DATA TYPE*/
-#define APPSVC_DATA_CC			"slp.appsvc.data.CC"
+#define APPSVC_DATA_CC			"http://tizen.org/appsvc/data/cc"
 /** APP_SVC DATA TYPE*/
-#define APPSVC_DATA_BCC			"slp.appsvc.data.BCC"
+#define APPSVC_DATA_BCC			"http://tizen.org/appsvc/data/bcc"
 /** APP_SVC DATA TYPE*/
-#define APPSVC_DATA_TEXT		"slp.appsvc.data.TEXT"
+#define APPSVC_DATA_TEXT		"http://tizen.org/appsvc/data/text"
 /** APP_SVC DATA TYPE*/
-#define APPSVC_DATA_TITLE		"slp.appsvc.data.TITLE"
+#define APPSVC_DATA_TITLE		"http://tizen.org/appsvc/data/title"
 /** APP_SVC DATA TYPE*/
-#define APPSVC_DATA_SELECTED		"slp.appsvc.data.SELECTED"
+#define APPSVC_DATA_SELECTED		"http://tizen.org/appsvc/data/selected"
 /** APP_SVC DATA TYPE*/
-#define APPSVC_DATA_KEYWORD		"slp.appsvc.data.KEYWORD"
+#define APPSVC_DATA_KEYWORD		"http://tizen.org/appsvc/data/keyword"
 
 
 /**

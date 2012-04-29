@@ -78,7 +78,6 @@ static int __fini(void)
 
 int _svc_db_add_app(const char *op, const char *mime_type, const char *uri, const char *pkg_name)
 {
-	int ret = -1;
 	char m[BUF_MAX_LEN];
 	char u[BUF_MAX_LEN];
 	char query[BUF_MAX_LEN];
@@ -142,7 +141,6 @@ int _svc_db_delete_with_pkgname(const char *pkg_name)
 int _svc_db_is_defapp(const char *pkg_name)
 {
 	char query[BUF_MAX_LEN];
-	char* error_message = NULL;
 	sqlite3_stmt *stmt;
 	int cnt = 0;
 	int ret = -1;
@@ -178,11 +176,9 @@ int _svc_db_is_defapp(const char *pkg_name)
 
 char* _svc_db_get_app(const char *op, const char *mime_type, const char *uri)
 {
-	char* res = NULL;
 	char m[BUF_MAX_LEN];
 	char u[BUF_MAX_LEN];
 	char query[BUF_MAX_LEN];
-	char* error_message = NULL;
 	sqlite3_stmt* stmt;
 	int ret;
 	char* pkgname;
@@ -225,7 +221,7 @@ char* _svc_db_get_app(const char *op, const char *mime_type, const char *uri)
 	}
 
 	pkgname = malloc(BUF_MAX_LEN);
-	strncpy(pkgname,	sqlite3_column_text(stmt, 0),BUF_MAX_LEN-1);
+	strncpy(pkgname, (const char *)sqlite3_column_text(stmt, 0),BUF_MAX_LEN-1);
 	//pkgname = (char*) sqlite3_column_text(stmt, 0);
 
 	_D("pkgname : %s\n",pkgname);

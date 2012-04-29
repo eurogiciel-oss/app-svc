@@ -64,7 +64,7 @@ static void utc_appsvc_unset_defapp_func_01(void)
 {
 	int ret = APPSVC_RET_OK;
 	ret =
-	    appsvc_set_defapp("slp.appsvc.operation.xyz", NULL, NULL,
+	    appsvc_set_defapp("http://tizen.org/appsvc/operation/xyz", NULL, NULL,
 			      "org.tizen.xyz");
 	if (ret != APPSVC_RET_OK) {
 		tet_result(TET_UNINITIATED);

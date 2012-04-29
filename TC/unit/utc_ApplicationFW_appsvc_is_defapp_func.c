@@ -63,7 +63,7 @@ static void utc_appsvc_is_defapp_func_01(void)
 {
 	int ret = 0;
 	ret =
-	    appsvc_set_defapp("slp.appsvc.operation.abcd123", NULL, NULL,
+	    appsvc_set_defapp("http://tizen.org/appsvc/operation/abcd123", NULL, NULL,
 			      "org.tizen.abcd123");
 	if (ret != APPSVC_RET_OK) {
 		tet_infoline("Test initialization failed!!!");

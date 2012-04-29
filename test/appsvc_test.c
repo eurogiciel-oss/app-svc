@@ -42,7 +42,7 @@ typedef struct _test_func_t{
 	char* usage;
 }test_func_t;
 
-__set_bundle_from_args(bundle * kb)
+void __set_bundle_from_args(bundle * kb)
 {
 	int opt;
 	char *op = NULL;
@@ -50,7 +50,6 @@ __set_bundle_from_args(bundle * kb)
 	char *uri = NULL;
 	char *package = NULL;
 	char* key = NULL;
-	char* val = NULL;
 	char* val_array[128];
 	
 	while( (opt = getopt(gargc,gargv,"d:o:m:u:p:")) != -1){
@@ -75,14 +74,17 @@ __set_bundle_from_args(bundle * kb)
 				if(optarg){
 					int i = 0;
 					key = strtok(optarg,",");
-					while(val_array[i] = strtok(NULL,","))
+					while(1)
 					{
+						val_array[i] = strtok(NULL,",");
+						if(val_array[i] == NULL)
+							break;
 						i++;
 					}
 					if(i==1) 
 						appsvc_add_data(kb, key, val_array[0]);
 					else if(i>1) 
-						appsvc_add_data_array(kb, key, val_array, i);	
+						appsvc_add_data_array(kb, key, (const char **)val_array, i);
 				}
 				break;
 		}
@@ -108,7 +110,6 @@ __set_bundle_from_args(bundle * kb)
 
 int run_svc()
 {
-	static int num=0;
 	int ret;
 	bundle *kb=NULL;
 	kb = bundle_create();
@@ -150,11 +151,13 @@ static void prt_recvd_bundle(const char *key, const int type, const bundle_keyva
 	size_t *array_item_size;
 
 	char *val;
-	size_t *size;
+	size_t size;
 	int i;
 	
-	if(bundle_keyval_type_is_array(kv) > 0) {
-		bundle_keyval_get_array_val(kv, &array_val, &array_len, &array_item_size);
+	if(bundle_keyval_type_is_array((bundle_keyval_t *)kv) > 0) {
+		bundle_keyval_get_array_val((bundle_keyval_t *)kv,
+			(void ***)&array_val, (unsigned int *)&array_len,
+			&array_item_size);
 		
 		for (i=0;i<array_len;i++)
 		{
@@ -162,7 +165,7 @@ static void prt_recvd_bundle(const char *key, const int type, const bundle_keyva
 		}
 		
 	} else {
-		bundle_keyval_get_basic_val(kv, &val, &size);
+		bundle_keyval_get_basic_val((bundle_keyval_t *)kv, (void **)&val, &size);
 		printf("recvd - key: %s, value: %s\n",key,val);
 	}	
 }
@@ -193,12 +196,6 @@ int run_svc_res()
 {
 	static int num=0;
 	int ret;
-	int opt;
-	char *op = NULL;
-	char *mime = NULL;
-	char *uri = NULL;
-	char* key = NULL;
-	char* val = NULL;
 
 	bundle *kb=NULL;
 	kb = bundle_create();

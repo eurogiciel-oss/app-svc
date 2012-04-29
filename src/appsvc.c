@@ -62,10 +62,13 @@ typedef struct _appsvc_resolve_info_t{
 	int mime_set;
 }appsvc_resolve_info_t;
 
+extern int aul_launch_app_with_result(const char *pkgname, bundle *kb,
+			       void (*cbfunc) (bundle *, int, void *),
+			       void *data);
+
 static appsvc_cb_info_t *__create_rescb(int request_code, appsvc_res_fn cbfunc,
 					void *data);
 static void __remove_rescb(appsvc_cb_info_t *info);
-static void __bundle_iterate(const char *key, const char *val, void *data);
 static int __set_bundle(bundle *b, const char *key, const char *value);
 static void __aul_cb(bundle *b, int is_cancel, void *data);
 static int __svc_iter_func(const char* pkg_name, void *data);
@@ -99,15 +102,11 @@ static void __remove_rescb(appsvc_cb_info_t *info)
 	if(info) free(info);
 }
 
-static void __bundle_iterate(const char *key, const char *val, void *data)
-{
-	static int i=0;	
-	_D("%d %s %s", i++, key, val);
-}
-
 static int __set_bundle(bundle *b, const char *key, const char *value)
 {
-	char *val = bundle_get_val(b, key);
+	const char *val = NULL;
+
+	val = bundle_get_val(b, key);
 	if(val){
 		if( bundle_del(b, key) != 0 ){
 			return APPSVC_RET_ERROR;
@@ -155,7 +154,7 @@ static int __set_bundle_array(bundle *b, const char *key, const char **value, in
 
 static void __aul_cb(bundle *b, int is_cancel, void *data)
 {
-	char *val;
+	const char *val = NULL;
 	appsvc_cb_info_t*  cb_info;
 	int res;
 
@@ -220,10 +219,10 @@ static int __get_resolve_info(bundle *b, appsvc_resolve_info_t *info)
 	char *tmp2 = NULL;
 	char *strtok_buf = NULL;
 	
-	info->op = appsvc_get_operation(b);
-	info->uri = appsvc_get_uri(b);
-	info->origin_mime = info->mime = appsvc_get_mime(b);
-	info->pkgname = appsvc_get_pkgname(b);
+	info->op = (char *)appsvc_get_operation(b);
+	info->uri = (char *)appsvc_get_uri(b);
+	info->origin_mime = info->mime = (char *)appsvc_get_mime(b);
+	info->pkgname = (char *)appsvc_get_pkgname(b);
 
 	if(info->uri) {
 		if(strncmp(info->uri,"/",1) == 0){
@@ -338,7 +337,7 @@ static int __get_list_with_condition(char *op, char *scheme, char *mime, GSList 
 	if (ail_ret != AIL_ERROR_OK) 
 		return APPSVC_RET_ERROR;
 
-	snprintf(svc_filter, MAX_FILTER_STR_SIZE-1, "%s:%s:%s", op, scheme, mime);
+	snprintf(svc_filter, MAX_FILTER_STR_SIZE-1, "%s|%s|%s", op, scheme, mime);
 	_D("svc_filter : %s",svc_filter);
 
 	ail_ret = ail_filter_add_str(filter, AIL_PROP_X_SLP_SVC_STR, svc_filter);
@@ -425,8 +424,6 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 	char *pkgname;
 	int pkg_count = 0;
 	int ret = -1;
-
-	int mime_set = 0;
 
 	GSList *pkg_list = NULL;
 	GSList *iter = NULL;

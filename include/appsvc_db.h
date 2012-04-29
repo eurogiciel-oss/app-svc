@@ -36,6 +36,8 @@ extern "C"
 int _svc_db_add_app(const char *op, const char *mime_type, const char *uri, const char *pkg_name);
 int _svc_db_delete_with_pkgname(const char *pkg_name);
 char* _svc_db_get_app(const char *op, const char *mime_type, const char *uri);
+int _svc_db_is_defapp(const char *pkg_name);
+
 
 #ifdef __cplusplus
 }
