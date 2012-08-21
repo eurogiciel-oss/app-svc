@@ -94,6 +94,14 @@ extern "C" {
 /** APP_SVC DATA TYPE*/
 #define APPSVC_DATA_KEYWORD		"http://tizen.org/appsvc/data/keyword"
 
+/** APP SVC internal private key */
+#define APP_SVC_K_URI_R_INFO		"__APP_SVC_URI_R_INFO__"
+
+/** APP SVC internal private value */
+#define APP_SVC_V_SCHEME_AND_HOST		"__SCHEME_AND_HOST__"
+/** APP SVC internal private value */
+#define APP_SVC_V_SCHEME		"__SCHEME__"
+
 
 /**
  * @brief Return values in appsvc. 
@@ -134,6 +142,7 @@ typedef void (*appsvc_res_fn)(bundle *b, int request_code, appsvc_result_val res
 */
 typedef int (*appsvc_info_iter_fn)(const char *pkg_name, void *data);
 
+typedef int (*appsvc_host_res_fn)(void *data);
 
 /**
  * @par Description:
@@ -344,6 +353,44 @@ int appsvc_add_data_array(bundle *b, const char *key, const char **val_array, in
  */
 int appsvc_set_pkgname(bundle *b, const char *pkg_name);
 
+
+/**
+ * @par Description:
+ * This function sets a appid to launch application based on appsvc.
+ *
+ * @param[in] b bundle object
+ * @param[in] appid application id for explict launch
+ *
+ * @return 0 if success, negative value(<0) if fail
+ * @retval APPSVC_RET_OK - success
+ * @retval APPSVC_RET_ERROR - general error
+ * @retval APPSVC_RET_EINVAL - invalid argument(content)
+ *
+ * @pre None.
+ * @post None.
+ * @see None.
+ * @remarks None.
+ *
+ * @par Sample code:
+ * @code
+#include <appsvc.h>
+
+...
+{
+	bundle *b = NULL;
+
+	b = bundle_create();
+
+	appsvc_set_operation(b, APPSVC_OPERATION_PICK);
+	appsvc_set_mime(b,"image/jpg");
+	appsvc_set_appid(b, "org.tizen.mygallery");
+}
+ * @endcode
+ *
+ */
+int appsvc_set_appid(bundle *b, const char *appid);
+
+
 /**
  * @par Description:
  * This API launch application based on appsvc.
@@ -543,6 +590,33 @@ const char *appsvc_get_pkgname(bundle *b);
 
 /**
  * @par Description:
+ * This function gets a application id from bundle.
+ *
+ * @param[in] b bundle object
+ *
+ * @return Pointer for application id string if success, NULL if fail
+ *
+ * @pre None.
+ * @post None.
+ * @see None.
+ * @remarks None.
+ *
+ * @par Sample code:
+ * @code
+#include <appsvc.h>
+
+...
+{
+	char *val;
+	val = appsvc_get_appid(b);
+}
+ * @endcode
+ *
+ */
+const char *appsvc_get_appid(bundle *b);
+
+/**
+ * @par Description:
  * This function gets value from key.
  *
  * @param[in] b bundle object 
@@ -701,7 +775,8 @@ int appsvc_send_result(bundle *b, appsvc_result_val result);
  * @endcode
  *
  */
-int appsvc_set_defapp(const char *op,const char *mime_type,const char *scheme,const char *defapp);
+int appsvc_set_defapp(const char *op, const char *mime_type, const char *uri,
+				const char *defapp);
 
 /**
  * @par Description:

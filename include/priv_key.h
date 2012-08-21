@@ -37,6 +37,9 @@
 /** APP SVC internal private key */
 #define APP_SVC_K_RES_VAL	"__APP_SVC_K_RES_VAL__"
 
+/** APP SVC internal private key */
+#define APP_SVC_K_WIN_ID	"__APP_SVC_K_WIN_ID__"
+
 
 #endif		/* __PRIV_KEY_H__ */
 

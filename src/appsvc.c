@@ -27,6 +27,9 @@
 
 #include <ail.h>
 #include <aul.h>
+#include <libsoup/soup.h>
+#include <Ecore_X.h>
+#include <Ecore.h>
 
 #include "appsvc.h"
 #include "appsvc_db.h"
@@ -55,6 +58,8 @@ typedef struct _appsvc_resolve_info_t{
 	char *op;
 	char *uri;
 	char *scheme;
+	char *host;
+	char *uri_r_info;
 	char *origin_mime;
 	char *mime;	
 	char *m_type;
@@ -71,14 +76,13 @@ static appsvc_cb_info_t *__create_rescb(int request_code, appsvc_res_fn cbfunc,
 static void __remove_rescb(appsvc_cb_info_t *info);
 static int __set_bundle(bundle *b, const char *key, const char *value);
 static void __aul_cb(bundle *b, int is_cancel, void *data);
-static int __svc_iter_func(const char* pkg_name, void *data);
 static int __run_svc_with_pkgname(char *pkgname, bundle *b, int request_code,
 				  appsvc_res_fn cbfunc, void *data);
 static int __get_resolve_info(bundle *b, appsvc_resolve_info_t *info);
 static int __free_resolve_info_data(appsvc_resolve_info_t *info);
 static ail_cb_ret_e __ail_iter_func(const ail_appinfo_h appinfo,
 				    void *user_data);
-static int __get_list_with_condition(char *op, char *scheme, 
+static int __get_list_with_condition(char *op, char *uri,
 				     char *mime, GSList **pkg_list);
 
 
@@ -179,18 +183,6 @@ static void __aul_cb(bundle *b, int is_cancel, void *data)
 	return;
 }
 
-static int __svc_iter_func(const char* pkg_name, void *data)
-{
-	GSList **pkg_list = (GSList **)data;
-	char *pkgname = NULL;
-
-	pkgname = strdup(pkg_name);
-
-	*pkg_list = g_slist_append(*pkg_list, pkgname);
-
-	return 0;
-}
-
 static int __run_svc_with_pkgname(char *pkgname, bundle *b, int request_code, appsvc_res_fn cbfunc, void *data)
 {
 	appsvc_cb_info_t *cb_info = NULL;
@@ -216,8 +208,8 @@ static int __run_svc_with_pkgname(char *pkgname, bundle *b, int request_code, ap
 static int __get_resolve_info(bundle *b, appsvc_resolve_info_t *info)
 {
 	char *tmp = NULL;
-	char *tmp2 = NULL;
 	char *strtok_buf = NULL;
+	SoupURI *s_uri;
 	
 	info->op = (char *)appsvc_get_operation(b);
 	info->uri = (char *)appsvc_get_uri(b);
@@ -250,12 +242,26 @@ static int __get_resolve_info(bundle *b, appsvc_resolve_info_t *info)
 	}
 
 	if(info->uri) {
-		info->scheme = malloc(MAX_SCHEME_STR_SIZE);
-		tmp = strdup(info->uri);
-		tmp2 = strtok(tmp,":");
-		if(tmp2)
-			strncpy(info->scheme, tmp2, MAX_SCHEME_STR_SIZE-1);
-		free(tmp);
+		s_uri = soup_uri_new(info->uri);
+
+		if(!s_uri)
+			return APPSVC_RET_EINVAL;
+
+		if(s_uri->scheme) {
+			info->scheme = malloc(MAX_SCHEME_STR_SIZE);
+			strncpy(info->scheme, s_uri->scheme, MAX_SCHEME_STR_SIZE-1);
+		}
+		if(s_uri->host) {
+			info->host = malloc(MAX_HOST_STR_SIZE);
+			strncpy(info->host, s_uri->host, MAX_HOST_STR_SIZE-1);
+		}
+		if(info->scheme && info->host) {
+			info->uri_r_info = malloc(MAX_SCHEME_STR_SIZE+MAX_HOST_STR_SIZE+2);
+			snprintf(info->uri_r_info, MAX_SCHEME_STR_SIZE+MAX_HOST_STR_SIZE+1,
+				"%s://%s", info->scheme, info->host);
+		}
+
+		soup_uri_free(s_uri);
 	} else {
 		info->scheme = strdup("NULL");
 	}
@@ -281,7 +287,8 @@ static int __get_resolve_info(bundle *b, appsvc_resolve_info_t *info)
 			strncpy(info->s_type, "%", MAX_LOCAL_BUFSZ-1);	
 		}
 
-		if(!info->mime_set) info->mime = malloc(MAX_MIME_STR_SIZE);
+		if(!info->mime_set)
+			info->mime = malloc(MAX_MIME_STR_SIZE);
 		snprintf(info->mime, MAX_MIME_STR_SIZE-1, "%s/%s", info->m_type, info->s_type);
 	}
 
@@ -294,10 +301,14 @@ static int __free_resolve_info_data(appsvc_resolve_info_t *info)
 		free(info->mime);
 	if (info->scheme) 
 		free(info->scheme);
+	if (info->host)
+		free(info->host);
 	if (info->m_type)
 		free(info->m_type);
 	if (info->s_type)
 		free(info->s_type);
+	if (info->uri_r_info)
+		free(info->uri_r_info);
 	
 	return 0;
 }
@@ -327,7 +338,7 @@ static ail_cb_ret_e __ail_iter_func(
 	return AIL_CB_RET_CONTINUE;
 }
 
-static int __get_list_with_condition(char *op, char *scheme, char *mime, GSList **pkg_list)
+static int __get_list_with_condition(char *op, char *uri, char *mime, GSList **pkg_list)
 {
 	ail_filter_h filter;
 	ail_error_e ail_ret;
@@ -337,7 +348,7 @@ static int __get_list_with_condition(char *op, char *scheme, char *mime, GSList 
 	if (ail_ret != AIL_ERROR_OK) 
 		return APPSVC_RET_ERROR;
 
-	snprintf(svc_filter, MAX_FILTER_STR_SIZE-1, "%s|%s|%s", op, scheme, mime);
+	snprintf(svc_filter, MAX_FILTER_STR_SIZE-1, "%s|%s|%s", op, uri, mime);
 	_D("svc_filter : %s",svc_filter);
 
 	ail_ret = ail_filter_add_str(filter, AIL_PROP_X_SLP_SVC_STR, svc_filter);
@@ -418,6 +429,40 @@ SLPAPI int appsvc_set_pkgname(bundle *b, const char *pkg_name)
 	return __set_bundle(b, APP_SVC_K_PKG_NAME, pkg_name);
 }
 
+SLPAPI int appsvc_set_appid(bundle *b, const char *appid)
+{
+	if(b == NULL){
+		_E("bundle for appsvc_set_appid is NULL");
+		return APPSVC_RET_EINVAL;
+	}
+
+	return __set_bundle(b, APP_SVC_K_PKG_NAME, appid);
+}
+
+static int __get_list_with_condition_mime_extened(char *op, char *uri, char *mime,
+	char *m_type, char *s_type, GSList **pkg_list)
+{
+	char *tmp;
+
+	tmp = malloc(MAX_MIME_STR_SIZE);
+
+	__get_list_with_condition(op, uri, mime, pkg_list);
+
+	if ((strncmp(mime, "NULL", 4) != 0) && (strncmp(s_type, "%", 1) != 0)) {
+		snprintf(tmp, MAX_MIME_STR_SIZE-1, "%s/*", m_type);
+		__get_list_with_condition(op, uri, tmp, pkg_list);
+	}
+
+	if ((strncmp(mime, "NULL", 4) != 0) && (strncmp(m_type, "%", 1) != 0)) {
+		snprintf(tmp, MAX_MIME_STR_SIZE-1, "*/*");
+		__get_list_with_condition(op, uri, tmp, pkg_list);
+	}
+
+	free(tmp);
+
+	return 0;
+}
+
 SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc, void *data)
 {
 	appsvc_resolve_info_t info;
@@ -430,12 +475,14 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 	char *list_item;
 
 	if(b == NULL){
-		_E("bundle for appsvc_set_pkgname is NULL");
+		_E("bundle for appsvc_set_appid is NULL");
 		return APPSVC_RET_EINVAL;
 	}
 
 	memset(&info, 0, sizeof(appsvc_resolve_info_t));
-	__get_resolve_info(b, &info);
+	ret = __get_resolve_info(b, &info);
+	if(ret < 0)
+		return ret;
 
 	pkgname = info.pkgname;
 	_D("op - %s / mime - %s / shceme - %s\n", info.op, info.mime, info.scheme);
@@ -445,27 +492,65 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 		if(appsvc_get_operation(b) == NULL)
 			appsvc_set_operation(b,APPSVC_OPERATION_DEFAULT);
 		ret = __run_svc_with_pkgname(pkgname, b, request_code, cbfunc, data);
-		if (info.mime_set) appsvc_set_mime(b,NULL);
 		__free_resolve_info_data(&info);
 		return ret;
 	}
+
+	if(info.uri_r_info) {
+		pkgname = _svc_db_get_app(info.op, info.mime, info.uri_r_info);
+
+		if(pkgname==NULL){
+			__get_list_with_condition_mime_extened(info.op, info.uri_r_info,
+				info.mime, info.m_type, info.s_type, &pkg_list);
+			pkg_count = g_slist_length(pkg_list);
+			if(pkg_count > 0) {
+				__get_list_with_condition_mime_extened(info.op, info.scheme,
+					info.mime, info.m_type, info.s_type, &pkg_list);
+
+				pkg_count = g_slist_length(pkg_list);
+
+				if(pkg_count == 1){
+					pkgname = (char *)pkg_list->data;
+					if(pkgname != NULL){
+						ret = __run_svc_with_pkgname(pkgname, b, request_code, cbfunc, data);
+						goto end;
+					}
+				} else {
+					bundle_add(b, APP_SVC_K_URI_R_INFO, APP_SVC_V_SCHEME_AND_HOST);
+					ret = __run_svc_with_pkgname(APP_SELECTOR, b, request_code, cbfunc, data);
+					goto end;
+				}
+			}
+			for (iter = pkg_list; iter != NULL; iter = g_slist_next(iter)) {
+				list_item = (char *)iter->data;
+				g_free(list_item);
+			}
+			g_slist_free(pkg_list);
+			pkg_list = NULL;
+		}  else {
+			ret = __run_svc_with_pkgname(pkgname, b, request_code, cbfunc, data);
+			free(pkgname);
+			goto end;
+		}
+	}
 	
-	pkgname = _svc_db_get_app(info.op, info.origin_mime, info.scheme);
+	pkgname = _svc_db_get_app(info.op, info.mime, info.scheme);
 
 	if(pkgname==NULL){
-		appsvc_get_list(b, __svc_iter_func, (void *)&pkg_list);
-		
+		__get_list_with_condition_mime_extened(info.op, info.scheme,
+			info.mime, info.m_type, info.s_type, &pkg_list);
 		pkg_count = g_slist_length(pkg_list);
+
 		if(pkg_count == 1){
 			pkgname = (char *)pkg_list->data;
 			if(pkgname != NULL){
 				ret = __run_svc_with_pkgname(pkgname, b, request_code, cbfunc, data);
 			}
-		}
-		else if(pkg_count < 1){
-			if (info.mime_set) appsvc_set_mime(b,NULL);
+		} else if(pkg_count < 1) {
+			__free_resolve_info_data(&info);
 			return APPSVC_RET_ENOMATCH;
 		} else {
+			bundle_add(b, APP_SVC_K_URI_R_INFO, APP_SVC_V_SCHEME);
 			ret = __run_svc_with_pkgname(APP_SELECTOR, b, request_code, cbfunc, data);
 		}
 
@@ -476,10 +561,12 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 		g_slist_free(pkg_list);	
 	} else {
 		ret = __run_svc_with_pkgname(pkgname, b, request_code, cbfunc, data);
+		free(pkgname);
 	}
-	if (info.mime_set) appsvc_set_mime(b,NULL);
 
+end:
 	__free_resolve_info_data(&info);
+
 	return ret;
 }
 
@@ -488,6 +575,7 @@ SLPAPI int appsvc_get_list(bundle *b, appsvc_info_iter_fn iter_fn, void *data)
 	appsvc_resolve_info_t info;
 	char *pkgname = NULL;
 	int pkg_count;
+	int ret = -1;
 
 	GSList *pkg_list = NULL;
 	GSList *iter = NULL;
@@ -504,20 +592,19 @@ SLPAPI int appsvc_get_list(bundle *b, appsvc_info_iter_fn iter_fn, void *data)
 	
 	/* parse bundle */
 	memset(&info, 0, sizeof(appsvc_resolve_info_t));
-	__get_resolve_info(b,&info);
+	ret = __get_resolve_info(b,&info);
+	if(ret < 0)
+		return ret;
 	
 	_D("operation - %s / shceme - %s / mime - %s\n", info.op, info.scheme, info.mime);
-	__get_list_with_condition(info.op, info.scheme,info.mime, &pkg_list);
 
-	if ((strncmp(info.mime, "NULL", 4) != 0) && (strncmp(info.s_type, "%", 1) != 0)) {
-		snprintf(info.mime, MAX_MIME_STR_SIZE-1, "%s/*", info.m_type);
-		__get_list_with_condition(info.op, info.scheme, info.mime, &pkg_list);
+	if(info.uri_r_info) {
+		__get_list_with_condition_mime_extened(info.op, info.uri_r_info, 
+			info.mime, info.m_type, info.s_type, &pkg_list);
 	}
-
-	if ((strncmp(info.mime, "NULL", 4) != 0) && (strncmp(info.m_type, "%", 1) != 0)) {
-		snprintf(info.mime, MAX_MIME_STR_SIZE-1, "*/*");
-		__get_list_with_condition(info.op, info.scheme, info.mime, &pkg_list);
-	}
+	
+	__get_list_with_condition_mime_extened(info.op, info.scheme, 
+		info.mime, info.m_type, info.s_type, &pkg_list);
 
 	pkg_count = g_slist_length(pkg_list);
 	if (pkg_count == 0) {
@@ -565,6 +652,11 @@ SLPAPI const char **appsvc_get_data_array(bundle *b, const char *key, int *len)
 }
 
 SLPAPI const char *appsvc_get_pkgname(bundle *b)
+{
+	return bundle_get_val(b, APP_SVC_K_PKG_NAME);
+}
+
+SLPAPI const char *appsvc_get_appid(bundle *b)
 {
 	return bundle_get_val(b, APP_SVC_K_PKG_NAME);
 }
@@ -622,14 +714,15 @@ SLPAPI int appsvc_send_result(bundle *b, appsvc_result_val result)
 	return ret;
 } 
 
-SLPAPI int appsvc_set_defapp(const char *op,const char *mime_type,const char *scheme,const char *defapp)
+SLPAPI int appsvc_set_defapp(const char *op, const char *mime_type, const char *uri,
+					const char *defapp)
 {
 	int ret;
 
 	if(op == NULL || defapp == NULL)
 		return APPSVC_RET_EINVAL;
 
-	ret = _svc_db_add_app(op,mime_type,scheme,defapp);
+	ret = _svc_db_add_app(op, mime_type, uri, defapp);
 
 	if(ret < 0)
 		return APPSVC_RET_ERROR;
@@ -670,4 +763,69 @@ SLPAPI int appsvc_data_is_array(bundle *b, const char *key)
 	return 0;
 }
 
+typedef struct _appsvc_transient_cb_info_t{
+	appsvc_host_res_fn cb_func;
+	Ecore_X_Window win_id;
+	void *data;
+}appsvc_transient_cb_info_t;
+
+static Eina_Bool __transient_cb(void *data, int type, void *event)
+{
+	Ecore_X_Event_Window_Hide *ev;
+	appsvc_transient_cb_info_t*  cb_info;
+
+	ev = event;
+	cb_info = (appsvc_transient_cb_info_t*) data;
+
+	if(ev->win == cb_info->win_id) {
+		cb_info->cb_func(cb_info->data);
+		ecore_main_loop_quit();
+	}
+
+	return ECORE_CALLBACK_RENEW;
+}
+
+SLPAPI int appsvc_allow_transient_app(bundle *b, Ecore_X_Window id)
+{
+	char win_id[MAX_LOCAL_BUFSZ];
+
+	snprintf(win_id, MAX_LOCAL_BUFSZ, "%d", id);
+
+	if(b == NULL){
+		_E("bundle for appsvc_allow_transient_app is NULL");
+		return APPSVC_RET_EINVAL;
+	}
+
+	return __set_bundle(b, APP_SVC_K_WIN_ID, win_id);
+}
+
+SLPAPI int appsvc_request_transient_app(bundle *b, Ecore_X_Window callee_id, appsvc_host_res_fn cbfunc, void *data)
+{
+	char *caller = NULL;
+	Ecore_X_Window caller_id;
+
+	caller = bundle_get_val(b, APP_SVC_K_WIN_ID);
+	if(caller == NULL)
+		return APPSVC_RET_ERROR;
+
+	caller_id = atoi(caller);
+
+	ecore_x_icccm_transient_for_set(callee_id, caller_id);
+
+	ecore_x_window_client_manage(caller_id);
+
+	appsvc_transient_cb_info_t* info;
+
+	info = (appsvc_transient_cb_info_t*)calloc(1, sizeof(appsvc_transient_cb_info_t));
+	if(info == NULL)
+		return APPSVC_RET_ERROR;
+
+	info->win_id = caller_id;
+	info->cb_func = cbfunc;
+	info->data = data;
+
+	ecore_event_handler_add(ECORE_X_EVENT_WINDOW_DESTROY, __transient_cb, info);
+
+	return 0;
+}
 

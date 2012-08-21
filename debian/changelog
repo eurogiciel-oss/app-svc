@@ -1,7 +1,230 @@
+app-svc (0.1.25) unstable; urgency=low
+
+  * changed to use the application ID
+  * Git: slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.25
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Tue, 05 Jun 2012 20:46:18 +0900
+
+app-svc (0.1.24) unstable; urgency=low
+
+  * added new API for transient window
+  * Git: slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.24
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Mon, 04 Jun 2012 20:00:10 +0900
+
+app-svc (0.1.23) unstable; urgency=low
+
+  * Added error handle for uri
+  * Git: slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.23
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Fri, 18 May 2012 11:15:05 +0900
+
+app-svc (0.1.22) unstable; urgency=low
+
+  * Updated uri resolution
+  * Git: slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.22
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Tue, 03 Apr 2012 17:59:06 +0900
+
 app-svc (0.1.21) unstable; urgency=low
 
-  * Initial release
-  * Git: pkgs/a/app-svc
+  * Fixed compile warnings
+  * Git: slp/pkgs/a/app-svc
   * Tag: app-svc_0.1.21
 
  -- Jaeho Lee <jaeho81.lee@samsung.com>  Tue, 20 Mar 2012 14:11:59 +0900
+
+app-svc (0.1.20) unstable; urgency=low
+
+  * Changed operation and extra data format
+  * Git: slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.20
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Thu, 15 Mar 2012 17:18:15 +0900
+
+app-svc (0.1.19) unstable; urgency=low
+
+  * Added TC
+  * Git: slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.19
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Mon, 19 Dec 2011 14:30:00 +0900
+
+app-svc (0.1.18) unstable; urgency=low
+
+  * Fix appsvc_set_defapp bug
+  * Git: 165.213.180.234:slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.18
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Wed, 14 Dec 2011 14:53:09 +0900
+
+app-svc (0.1.17) unstable; urgency=low
+
+  * Changed boilerplate
+  * Git: 165.213.180.234:slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.17
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Mon, 05 Dec 2011 16:45:29 +0900
+
+app-svc (0.1.16) unstable; urgency=low
+
+  * Fix appsvc_test bug
+  * Git: 165.213.180.234:slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.16
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Mon, 14 Nov 2011 19:52:07 +0900
+
+app-svc (0.1.15) unstable; urgency=low
+
+  * Changed Boilerplate as per the guideline
+  * Git: 165.213.180.234:slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.15 
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Mon, 07 Nov 2011 17:36:50 +0900
+
+app-svc (0.1.14) unstable; urgency=low
+
+  * Fix prevent defects
+  * Git: 165.213.180.234:slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.14 
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Tue, 25 Oct 2011 20:39:26 +0900
+
+app-svc (0.1.13) unstable; urgency=low
+
+  * modify protype of appsvc_set_defapp
+  * Git: 165.213.180.234:slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.13 
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Sat, 15 Oct 2011 19:42:04 +0900
+
+app-svc (0.1.12) unstable; urgency=low
+
+  * Support array
+  * Git: 165.213.180.234:slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.12
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Thu, 06 Oct 2011 22:01:02 +0900
+
+app-svc (0.1.11) unstable; urgency=low
+
+  * About explicit svc
+  * Git: 165.213.180.234:slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.11 
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Wed, 21 Sep 2011 21:08:11 +0900
+
+app-svc (0.1.10) unstable; urgency=low
+
+  * Fix bug
+  * Git: 165.213.180.234:slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.10 
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Sat, 17 Sep 2011 18:39:01 +0900
+
+app-svc (0.1.9) unstable; urgency=low
+
+  * changelog
+  * Git: 165.213.180.234:slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.9 
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Mon, 05 Sep 2011 21:00:46 +0900
+
+app-svc (0.1.8) unstable; urgency=low
+
+  * Fix prevent defects
+  * Git: 165.213.180.234:slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.8 
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Mon, 05 Sep 2011 13:46:19 +0900
+
+app-svc (0.1.7) unstable; urgency=low
+
+  * Fix bug
+  * Git: 165.213.180.234:slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.7 
+
+ -- Jaeho81.lee <jaeho81.lee@samsung.com>  Wed, 31 Aug 2011 16:32:47 +0900
+
+app-svc (0.1.6) unstable; urgency=low
+
+  * Add appsvc_is_defapp API
+  * Git: 165.213.180.234:slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.6 
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Thu, 25 Aug 2011 20:55:10 +0900
+
+app-svc (0.1.5) unstable; urgency=low
+
+  * Add appsvc_unset_defapp API
+  * Git: 165.213.180.234:slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.5 
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Thu, 25 Aug 2011 09:57:36 +0900
+
+app-svc (0.1.4) unstable; urgency=low
+
+  * Fix prevnet defects
+  * Git: 165.213.180.234:slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.4 
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Sat, 20 Aug 2011 18:07:30 +0900
+
+app-svc (0.1.3) unstable; urgency=low
+
+  * Fix bug
+  * Git: 165.213.180.234:slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.3 
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Fri, 19 Aug 2011 16:09:27 +0900
+
+app-svc (0.1.2) unstable; urgency=low
+
+  * Modify comments for build warning
+  * Git: 165.213.180.234:slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.2 
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Sat, 13 Aug 2011 18:23:56 +0900
+
+app-svc (0.1.1) unstable; urgency=low
+
+  * Fix bug
+  * Git: 165.213.180.234:slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.1 
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Thu, 11 Aug 2011 13:18:30 +0900
+
+app-svc (0.1.0-2) unstable; urgency=low
+
+  * Apply appsvc code
+  * Git: 165.213.180.234:slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.0-2 
+
+ -- Sewook Park <sewook7.park@samsung.com>  Wed, 10 Aug 2011 21:36:09 +0900
+
+app-svc (0.1.0-1) unstable; urgency=low
+
+  * Apply appsvc code
+  * Git: 165.213.180.234:slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.0-1
+
+ -- Sewook Park <sewook7.park@samsung.com>  Wed, 10 Aug 2011 20:54:10 +0900
+
+app-svc (0.1.0) unstable; urgency=low
+
+  * Apply appsvc code
+  * Git: 165.213.180.234:slp/pkgs/a/app-svc
+  * Tag: app-svc_0.1.0
+
+ -- Sewook ParK <sewook7.park@samsung.com>  Wed, 10 Aug 2011 18:48:45 +0900
+
+app-svc (0.0.1) unstable; urgency=low
+
+  * initial update
+
+ -- Jaeho Lee <jaeho81.lee@samsung.com>  Tue, 19 Jul 2011 10:23:24 +0900
+

@@ -103,7 +103,7 @@ void __set_bundle_from_args(bundle * kb)
 		free(uri);
 	}
 	if(package) {
-		appsvc_set_pkgname(kb,package);
+		appsvc_set_appid(kb,package);
 		free(package);
 	}
 }

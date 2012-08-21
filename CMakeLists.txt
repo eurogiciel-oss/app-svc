@@ -23,7 +23,7 @@ MESSAGE("Build type: ${CMAKE_BUILD_TYPE}")
 INCLUDE(FindPkgConfig)
 
 pkg_check_modules(pkgs REQUIRED dlog ecore x11 libprivilege-control aul)
-pkg_check_modules(libpkgs REQUIRED dlog bundle dbus-glib-1 ail xdgmime aul glib-2.0)
+pkg_check_modules(libpkgs REQUIRED dlog bundle dbus-glib-1 ail xdgmime aul glib-2.0 ecore-x ecore libsoup-2.4)
 
 FIND_LIBRARY(LIB_DL dl)
 

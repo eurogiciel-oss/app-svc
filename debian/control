@@ -2,7 +2,7 @@ Source: app-svc
 Section: devel
 Priority: extra
 Maintainer: Jayoun Lee <airjany@samsung.com>, Sewook Park <sewook7.park@samsung.com>, Jaeho Lee <jaeho81.lee@samsung.com>
-Build-Depends: debhelper (>= 5), libdbus-glib-1-dev, libsqlite3-dev, libx11-dev, libecore-dev, libbundle-dev, libail-0-dev, dlog-dev, libxdgmime-dev, libprivilege-control-dev, sqlite3, libaul-1-dev
+Build-Depends: debhelper (>= 5), libdbus-glib-1-dev, libsqlite3-dev, libx11-dev, libecore-dev, libbundle-dev, libail-0-dev, dlog-dev, libxdgmime-dev, libprivilege-control-dev, sqlite3, libaul-1-dev, libecore-dev, libsoup2.4-dev
 Standards-Version: 0.1.0 
 
 Package: libappsvc-dev
