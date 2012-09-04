@@ -54,45 +54,45 @@ extern "C" {
 
 
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_DEFAULT		"http://tizen.org/appsvc/operation/default"
+#define APPSVC_OPERATION_DEFAULT		"http://tizen.org/appcontrol/operation/default"
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_EDIT			"http://tizen.org/appsvc/operation/edit"
+#define APPSVC_OPERATION_EDIT			"http://tizen.org/appcontrol/operation/edit"
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_VIEW			"http://tizen.org/appsvc/operation/view"
+#define APPSVC_OPERATION_VIEW			"http://tizen.org/appcontrol/operation/view"
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_PICK			"http://tizen.org/appsvc/operation/pick"
+#define APPSVC_OPERATION_PICK			"http://tizen.org/appcontrol/operation/pick"
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_CREATE_CONTENT		"http://tizen.org/appsvc/operation/create_content"
+#define APPSVC_OPERATION_CREATE_CONTENT		"http://tizen.org/appcontrol/operation/create_content"
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_CALL			"http://tizen.org/appsvc/operation/call"
+#define APPSVC_OPERATION_CALL			"http://tizen.org/appcontrol/operation/call"
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_SEND			"http://tizen.org/appsvc/operation/send"
+#define APPSVC_OPERATION_SEND			"http://tizen.org/appcontrol/operation/send"
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_SEND_TEXT		"http://tizen.org/appsvc/operation/send_text"
+#define APPSVC_OPERATION_SEND_TEXT		"http://tizen.org/appcontrol/operation/send_text"
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_DIAL			"http://tizen.org/appsvc/operation/dial"
+#define APPSVC_OPERATION_DIAL			"http://tizen.org/appcontrol/operation/dial"
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_SEARCH			"http://tizen.org/appsvc/operation/search"
+#define APPSVC_OPERATION_SEARCH			"http://tizen.org/appcontrol/operation/search"
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_DOWNLOAD		"http://tizen.org/appsvc/operation/download"
+#define APPSVC_OPERATION_DOWNLOAD		"http://tizen.org/appcontrol/operation/download"
 
 
 /** APP_SVC DATA SUBJECT*/
-#define APPSVC_DATA_SUBJECT		"http://tizen.org/appsvc/data/subject"
+#define APPSVC_DATA_SUBJECT		"http://tizen.org/appcontrol/data/subject"
 /** APP_SVC DATA TYPE*/
-#define APPSVC_DATA_TO			"http://tizen.org/appsvc/data/to"
+#define APPSVC_DATA_TO			"http://tizen.org/appcontrol/data/to"
 /** APP_SVC DATA TYPE*/
-#define APPSVC_DATA_CC			"http://tizen.org/appsvc/data/cc"
+#define APPSVC_DATA_CC			"http://tizen.org/appcontrol/data/cc"
 /** APP_SVC DATA TYPE*/
-#define APPSVC_DATA_BCC			"http://tizen.org/appsvc/data/bcc"
+#define APPSVC_DATA_BCC			"http://tizen.org/appcontrol/data/bcc"
 /** APP_SVC DATA TYPE*/
-#define APPSVC_DATA_TEXT		"http://tizen.org/appsvc/data/text"
+#define APPSVC_DATA_TEXT		"http://tizen.org/appcontrol/data/text"
 /** APP_SVC DATA TYPE*/
-#define APPSVC_DATA_TITLE		"http://tizen.org/appsvc/data/title"
+#define APPSVC_DATA_TITLE		"http://tizen.org/appcontrol/data/title"
 /** APP_SVC DATA TYPE*/
-#define APPSVC_DATA_SELECTED		"http://tizen.org/appsvc/data/selected"
+#define APPSVC_DATA_SELECTED		"http://tizen.org/appcontrol/data/selected"
 /** APP_SVC DATA TYPE*/
-#define APPSVC_DATA_KEYWORD		"http://tizen.org/appsvc/data/keyword"
+#define APPSVC_DATA_KEYWORD		"http://tizen.org/appcontrol/data/keyword"
 
 /** APP SVC internal private key */
 #define APP_SVC_K_URI_R_INFO		"__APP_SVC_URI_R_INFO__"
