@@ -485,7 +485,7 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 		return ret;
 
 	pkgname = info.pkgname;
-	_D("op - %s / mime - %s / shceme - %s\n", info.op, info.mime, info.scheme);
+	_D("op - %s / mime - %s / shceme - %s\n", info.op, info.origin_mime, info.scheme);
 
 	/* explict*/
 	if(pkgname) {
@@ -497,7 +497,7 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 	}
 
 	if(info.uri_r_info) {
-		pkgname = _svc_db_get_app(info.op, info.mime, info.uri_r_info);
+		pkgname = _svc_db_get_app(info.op, info.origin_mime, info.uri_r_info);
 
 		if(pkgname==NULL){
 			__get_list_with_condition_mime_extened(info.op, info.uri_r_info,
@@ -534,7 +534,7 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 		}
 	}
 	
-	pkgname = _svc_db_get_app(info.op, info.mime, info.scheme);
+	pkgname = _svc_db_get_app(info.op, info.origin_mime, info.scheme);
 
 	if(pkgname==NULL){
 		__get_list_with_condition_mime_extened(info.op, info.scheme,

@@ -1,7 +1,7 @@
 #sbs-git:slp/pkgs/a/app-svc app-svc 0.1.19 de68cdc468eaded317b4f5be9cdafebb01639aa0
 Name:	    app-svc
 Summary:    App svc
-Version: 0.1.27
+Version: 0.1.33
 Release:    1
 Group:      System/Libraries
 License:    Apache License, Version 2.0
@@ -62,10 +62,13 @@ chown 0:5000 /opt/dbspace/.appsvc.db
 chown 0:5000 /opt/dbspace/.appsvc.db-journal
 chmod 664 /opt/dbspace/.appsvc.db
 chmod 664 /opt/dbspace/.appsvc.db-journal
+chsmack -a 'app-svc::db' opt/dbspace/.appsvc.db
+chsmack -a 'app-svc::db' opt/dbspace/.appsvc.db-journal
 
 %postun -p /sbin/ldconfig
 
 %files
+%manifest app-svc.manifest
 %defattr(-,root,root,-)
 /opt/share/appsvc_db.sql
 /usr/bin/appsvc_test

@@ -140,7 +140,7 @@ typedef void (*appsvc_res_fn)(bundle *b, int request_code, appsvc_result_val res
  * @param[out]	pkg_name	package name retreived by appsvc_get_list
  * @param[out]	data		user-supplied data	
 */
-typedef int (*appsvc_info_iter_fn)(const char *pkg_name, void *data);
+typedef int (*appsvc_info_iter_fn)(const char *appid, void *data);
 
 typedef int (*appsvc_host_res_fn)(void *data);
 
@@ -351,7 +351,8 @@ int appsvc_add_data_array(bundle *b, const char *key, const char **val_array, in
  * @endcode
  *
  */
-int appsvc_set_pkgname(bundle *b, const char *pkg_name);
+/* Deprecated API */
+int appsvc_set_pkgname(bundle *b, const char *pkg_name); // __attribute__((deprecated));
 
 
 /**
@@ -586,7 +587,8 @@ const char *appsvc_get_mime(bundle *b);
  * @endcode
  *
  */
-const char *appsvc_get_pkgname(bundle *b);
+/* Deprecated API */
+const char *appsvc_get_pkgname(bundle *b); // __attribute__((deprecated));
 
 /**
  * @par Description:
@@ -835,7 +837,7 @@ int appsvc_unset_defapp(const char *defapp);
  *	None
 * 
 */
-int appsvc_is_defapp(const char *pkg_name);
+int appsvc_is_defapp(const char *appid);
 
 
 /**
