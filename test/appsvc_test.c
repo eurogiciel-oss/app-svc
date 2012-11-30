@@ -49,10 +49,11 @@ void __set_bundle_from_args(bundle * kb)
 	char *mime = NULL;
 	char *uri = NULL;
 	char *package = NULL;
+	char *category = NULL;
 	char* key = NULL;
 	char* val_array[128];
 	
-	while( (opt = getopt(gargc,gargv,"d:o:m:u:p:")) != -1){
+	while( (opt = getopt(gargc,gargv,"d:o:m:u:p:c:")) != -1){
 		switch(opt) {
 			case 'o':
 				if(optarg)
@@ -69,6 +70,10 @@ void __set_bundle_from_args(bundle * kb)
 			case 'p':
 				if(optarg)
 					package = strdup(optarg);
+				break;
+			case 'c':
+				if(optarg)
+					category = strdup(optarg);
 				break;
 			case 'd':
 				if(optarg){
@@ -105,6 +110,10 @@ void __set_bundle_from_args(bundle * kb)
 	if(package) {
 		appsvc_set_appid(kb,package);
 		free(package);
+	}
+	if(category) {
+		appsvc_set_category(kb,category);
+		free(category);
 	}
 }
 

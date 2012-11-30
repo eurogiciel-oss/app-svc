@@ -35,6 +35,8 @@
 /** APP SVC internal private key */
 #define APP_SVC_K_PKG_NAME	"__APP_SVC_PKG_NAME__"
 /** APP SVC internal private key */
+#define APP_SVC_K_CATEGORY	"__APP_SVC_CATEGORY__"
+/** APP SVC internal private key */
 #define APP_SVC_K_RES_VAL	"__APP_SVC_K_RES_VAL__"
 
 /** APP SVC internal private key */

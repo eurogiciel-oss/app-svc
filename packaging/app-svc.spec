@@ -1,7 +1,7 @@
 #sbs-git:slp/pkgs/a/app-svc app-svc 0.1.19 de68cdc468eaded317b4f5be9cdafebb01639aa0
 Name:	    app-svc
 Summary:    App svc
-Version: 0.1.33
+Version: 0.1.34
 Release:    1
 Group:      System/Libraries
 License:    Apache License, Version 2.0
@@ -24,6 +24,8 @@ BuildRequires: pkgconfig(xdgmime)
 BuildRequires: pkgconfig(aul)
 BuildRequires: pkgconfig(glib-2.0)
 BuildRequires: pkgconfig(libsoup-2.4)
+BuildRequires: pkgconfig(iniparser)
+BuildRequires: pkgconfig(pkgmgr-info)
 
 
 %description

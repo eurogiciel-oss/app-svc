@@ -30,6 +30,8 @@
 #include <libsoup/soup.h>
 #include <Ecore_X.h>
 #include <Ecore.h>
+#include <iniparser.h>
+#include <pkgmgr-info.h>
 
 #include "appsvc.h"
 #include "appsvc_db.h"
@@ -64,6 +66,7 @@ typedef struct _appsvc_resolve_info_t{
 	char *mime;	
 	char *m_type;
 	char *s_type;
+	char *category;
 	int mime_set;
 }appsvc_resolve_info_t;
 
@@ -215,6 +218,7 @@ static int __get_resolve_info(bundle *b, appsvc_resolve_info_t *info)
 	info->uri = (char *)appsvc_get_uri(b);
 	info->origin_mime = info->mime = (char *)appsvc_get_mime(b);
 	info->pkgname = (char *)appsvc_get_pkgname(b);
+	info->category = (char *)appsvc_get_category(b);
 
 	if(info->uri) {
 		if(strncmp(info->uri,"/",1) == 0){
@@ -429,14 +433,62 @@ SLPAPI int appsvc_set_pkgname(bundle *b, const char *pkg_name)
 	return __set_bundle(b, APP_SVC_K_PKG_NAME, pkg_name);
 }
 
+static char* __get_alias_appid(char *appid)
+{
+	char *alias_id = NULL;
+	char *val = NULL;
+	char key_string[MAX_PACKAGE_STR_SIZE+5];
+	dictionary *dic;
+
+	dic = iniparser_load("/usr/share/appsvc/alias.ini");
+
+	if(dic == NULL)
+		return NULL;
+
+	sprintf(key_string, "Alias:%s", appid);
+	val = iniparser_getstr(dic, key_string);
+
+	_D("alias_id : %s", val);
+
+	if(val != NULL) {
+		alias_id = malloc(MAX_PACKAGE_STR_SIZE);
+		strncpy(alias_id, val, MAX_PACKAGE_STR_SIZE-1);
+	}
+
+	iniparser_freedict(dic);
+
+	return alias_id;
+}
+
 SLPAPI int appsvc_set_appid(bundle *b, const char *appid)
 {
-	if(b == NULL){
+	char *alias_id = NULL;
+	int ret;
+
+	if(b == NULL || appid == NULL){
 		_E("bundle for appsvc_set_appid is NULL");
 		return APPSVC_RET_EINVAL;
 	}
 
-	return __set_bundle(b, APP_SVC_K_PKG_NAME, appid);
+	alias_id = __get_alias_appid(appid);
+	if(alias_id == NULL) {
+		ret = __set_bundle(b, APP_SVC_K_PKG_NAME, appid);
+	} else {
+		ret = __set_bundle(b, APP_SVC_K_PKG_NAME, alias_id);
+		free(alias_id);
+	}
+
+	return ret;
+}
+
+SLPAPI int appsvc_set_category(bundle *b, const char *category)
+{
+	if(b == NULL){
+		_E("bundle for appsvc_set_category is NULL");
+		return APPSVC_RET_EINVAL;
+	}
+
+	return __set_bundle(b, APP_SVC_K_CATEGORY, category);
 }
 
 static int __get_list_with_condition_mime_extened(char *op, char *uri, char *mime,
@@ -459,6 +511,59 @@ static int __get_list_with_condition_mime_extened(char *op, char *uri, char *mim
 	}
 
 	free(tmp);
+
+	return 0;
+}
+
+GSList *tmp_list;
+static int __app_list_cb(pkgmgrinfo_appinfo_h handle, void *user_data)
+{
+	char *appid = NULL;
+	GSList **app_list = (GSList **)user_data;
+	char *str = NULL;
+	GSList *iter = NULL;
+
+	pkgmgrinfo_appinfo_get_appid(handle, &str);
+	_D("Matching application is %s",str);
+
+	for (iter = tmp_list; iter != NULL; iter = g_slist_next(iter)) {
+		if (strncmp(str, (char *)iter->data, MAX_PACKAGE_STR_SIZE-1) == 0) {
+			appid = strdup(str);
+			*app_list = g_slist_append(*app_list, (void *)appid);
+			_D("%s is added",appid);
+		}
+	}
+
+	return 0;
+}
+
+static int __get_list_with_category(char *category, GSList **pkg_list)
+{
+	int ret;
+	pkgmgrinfo_appinfo_filter_h handle;
+	GSList *app_list;
+	GSList *iter = NULL;
+	char *list_item = NULL;
+	int match;
+
+	ret = pkgmgrinfo_appinfo_filter_create(&handle);
+	ret = pkgmgrinfo_appinfo_filter_add_string(handle, PMINFO_APPINFO_PROP_APP_CATEGORY, category);
+
+	tmp_list = *pkg_list;
+	ret = pkgmgrinfo_appinfo_filter_foreach_appinfo(handle, __app_list_cb, &app_list);
+	if (ret != PMINFO_R_OK) {
+		pkgmgrinfo_appinfo_filter_destroy(handle);
+		return -1;
+	}
+	pkgmgrinfo_appinfo_filter_destroy(handle);
+
+	for (iter = *pkg_list; iter != NULL; iter = g_slist_next(iter)) {
+		list_item = (char *)iter->data;
+		g_free(list_item);
+	}
+	g_slist_free(*pkg_list);
+
+	*pkg_list = app_list;
 
 	return 0;
 }
@@ -507,7 +612,12 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 				__get_list_with_condition_mime_extened(info.op, info.scheme,
 					info.mime, info.m_type, info.s_type, &pkg_list);
 
+				if(info.category) {
+					__get_list_with_category(info.category, &pkg_list);
+				}
+
 				pkg_count = g_slist_length(pkg_list);
+				_D("pkg_count : %d", pkg_count);
 
 				if(pkg_count == 1){
 					pkgname = (char *)pkg_list->data;
@@ -539,7 +649,13 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 	if(pkgname==NULL){
 		__get_list_with_condition_mime_extened(info.op, info.scheme,
 			info.mime, info.m_type, info.s_type, &pkg_list);
+
+		if(info.category) {
+			__get_list_with_category(info.category, &pkg_list);
+		}
+
 		pkg_count = g_slist_length(pkg_list);
+		_D("pkg_count : %d", pkg_count);
 
 		if(pkg_count == 1){
 			pkgname = (char *)pkg_list->data;
@@ -659,6 +775,11 @@ SLPAPI const char *appsvc_get_pkgname(bundle *b)
 SLPAPI const char *appsvc_get_appid(bundle *b)
 {
 	return bundle_get_val(b, APP_SVC_K_PKG_NAME);
+}
+
+SLPAPI const char *appsvc_get_category(bundle *b)
+{
+	return bundle_get_val(b, APP_SVC_K_CATEGORY);
 }
 
 SLPAPI int appsvc_create_result_bundle(bundle *inb, bundle **outb)

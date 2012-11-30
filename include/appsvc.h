@@ -394,6 +394,41 @@ int appsvc_set_appid(bundle *b, const char *appid);
 
 /**
  * @par Description:
+ * This function sets a appid to launch application based on appsvc.
+ *
+ * @param[in] b bundle object
+ * @param[in] application category
+ *
+ * @return 0 if success, negative value(<0) if fail
+ * @retval APPSVC_RET_OK - success
+ * @retval APPSVC_RET_ERROR - general error
+ * @retval APPSVC_RET_EINVAL - invalid argument(content)
+ *
+ * @pre None.
+ * @post None.
+ * @see None.
+ * @remarks None.
+ *
+ * @par Sample code:
+ * @code
+#include <appsvc.h>
+
+...
+{
+	bundle *b = NULL;
+
+	b = bundle_create();
+
+	appsvc_set_operation(b, APPSVC_OPERATION_VIEW);
+	appsvc_set_category(b, "http://tizen.org/category/app/browser");
+}
+ * @endcode
+ *
+ */
+int appsvc_set_category(bundle *b, const char *category);
+
+/**
+ * @par Description:
  * This API launch application based on appsvc.
  *
  * @param[in] b bundle to be passed to callee
@@ -616,6 +651,33 @@ const char *appsvc_get_pkgname(bundle *b); // __attribute__((deprecated));
  *
  */
 const char *appsvc_get_appid(bundle *b);
+
+/**
+ * @par Description:
+ * This function gets a application category from bundle.
+ *
+ * @param[in] b bundle object
+ *
+ * @return Pointer for application category string if success, NULL if fail
+ *
+ * @pre None.
+ * @post None.
+ * @see None.
+ * @remarks None.
+ *
+ * @par Sample code:
+ * @code
+#include <appsvc.h>
+
+...
+{
+	char *val;
+	val = appsvc_get_category(b);
+}
+ * @endcode
+ *
+ */
+const char *appsvc_get_category(bundle *b);
 
 /**
  * @par Description:
