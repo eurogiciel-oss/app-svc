@@ -23,16 +23,23 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <glib.h>
 
 #include "appsvc_db.h"
 #include "internal.h"
 
 
 #define SVC_DB_PATH	"/opt/dbspace/.appsvc.db"
+#define APP_INFO_DB_PATH	"/opt/dbspace/.app_info.db"
+
 #define QUERY_MAXLEN	4096
 #define BUF_MAX_LEN	1024
 
+#define APPSVC_COLLATION "appsvc_collation"
+
 static sqlite3 *svc_db = NULL;
+static sqlite3 *app_info_db = NULL;
+
 
 
 /**
@@ -65,6 +72,104 @@ err:
 	sqlite3_close(svc_db);
 	return -1;
 }
+
+static int __collate_appsvc(void *ucol, int str1_len, const void *str1, int str2_len, const void *str2)
+{
+	char *saveptr1, *saveptr2;
+	char *dup_str1;
+	char *dup_str2;
+	char *token;
+	char *in_op;
+	char *in_uri;
+	char *in_mime;
+	char *op;
+	char *uri;
+	char *mime;
+	int i;
+
+	if(str1 == NULL || str2 == NULL)
+		return -1;
+
+	dup_str1 = strdup(str1);
+	dup_str2 = strdup(str2);
+
+	in_op = strtok_r(dup_str2, "|", &saveptr1);
+	in_uri = strtok_r(NULL, "|", &saveptr1);
+	in_mime = strtok_r(NULL, "|", &saveptr1);
+
+	token = strtok_r(dup_str1, ";", &saveptr1);
+
+	if(token == NULL) {
+		free(dup_str1);
+		free(dup_str2);
+		return -1;
+	}
+
+	do {
+		//_D("token : %s", token);
+		op = strtok_r(token, "|", &saveptr2);
+		uri = strtok_r(NULL, "|", &saveptr2);
+		mime = strtok_r(NULL, "|", &saveptr2);
+
+		if( (strcmp(op, in_op) == 0) && (strcmp(mime, in_mime) == 0) ) {
+			_D("%s %s %s %s %s %s", op, in_op, mime, in_mime, uri, in_uri);
+			if(strcmp(uri, in_uri) == 0) {
+				free(dup_str1);
+				free(dup_str2);
+				return 0;
+			} else {
+				for(i=0; uri[i]!=0; i++) {
+					if(uri[i] == '*') {
+						uri[i] = 0;
+						if(strstr(in_uri, uri)) {
+							_D("in_uri : %s | uri : %s", in_uri, uri);
+							free(dup_str1);
+							free(dup_str2);
+							return 0;
+						}
+					}
+				}
+			}
+		}
+	} while(token = strtok_r(NULL, ";", &saveptr1));
+
+	free(dup_str1);
+	free(dup_str2);
+
+	return -1;
+}
+
+static int __init_app_info_db(void)
+{
+	int rc;
+
+	if (app_info_db) {
+		_D("Already initialized\n");
+		return 0;
+	}
+
+	rc = sqlite3_open(APP_INFO_DB_PATH, &app_info_db);
+	if(rc) {
+		_E("Can't open database: %s", sqlite3_errmsg(app_info_db));
+		goto err;
+	}
+
+	// Enable persist journal mode
+	rc = sqlite3_exec(app_info_db, "PRAGMA journal_mode = PERSIST", NULL, NULL, NULL);
+	if(SQLITE_OK!=rc){
+		_D("Fail to change journal mode\n");
+		goto err;
+	}
+
+	sqlite3_create_collation(app_info_db, APPSVC_COLLATION, SQLITE_UTF8, NULL,
+                __collate_appsvc);
+
+	return 0;
+err:
+	sqlite3_close(app_info_db);
+	return -1;
+}
+
 
 static int __fini(void)
 {
@@ -232,4 +337,50 @@ char* _svc_db_get_app(const char *op, const char *mime_type, const char *uri)
 
 	return pkgname;
 }
+
+int _svc_db_get_list_with_collation(char *op, char *uri, char *mime, GSList **pkg_list)
+{
+	char query[BUF_MAX_LEN];
+	sqlite3_stmt* stmt;
+	int ret;
+	GSList *iter = NULL;
+	char *str = NULL;
+	char *pkgname = NULL;
+	int found;
+
+	if(__init_app_info_db()<0)
+		return 0;
+
+	sprintf(query,"select package from app_info where x_slp_svc='%s|%s|%s' collate appsvc_collation", op,uri,mime);
+	_D("query : %s\n",query);
+
+	ret = sqlite3_prepare(app_info_db, query, strlen(query), &stmt, NULL);
+
+	if ( ret != SQLITE_OK) {
+		_E("prepare error\n");
+		return -1;
+	}
+
+	while (sqlite3_step(stmt) == SQLITE_ROW) {
+		str = sqlite3_column_text(stmt, 0);
+		found = 0;
+		for (iter = *pkg_list; iter != NULL; iter = g_slist_next(iter)) {
+			pkgname = (char *)iter->data;
+			if (strncmp(str,pkgname, MAX_PACKAGE_STR_SIZE-1) == 0) {
+				found = 1;
+				break;
+			}
+		}
+		if(found == 0) {
+			pkgname = strdup(str);
+			*pkg_list = g_slist_append(*pkg_list, (void *)pkgname);
+			_D("%s is added",pkgname);
+		}
+	}
+
+	ret = sqlite3_finalize(stmt);
+
+	return 0;
+}
+
 

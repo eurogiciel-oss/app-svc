@@ -515,6 +515,14 @@ static int __get_list_with_condition_mime_extened(char *op, char *uri, char *mim
 	return 0;
 }
 
+static int __get_list_with_condition_mime_extened_with_collation(char *op, char *uri, char *mime,
+	char *m_type, char *s_type, GSList **pkg_list)
+{
+	_svc_db_get_list_with_collation(op, uri, mime, pkg_list);
+
+	return 0;
+}
+
 GSList *tmp_list;
 static int __app_list_cb(pkgmgrinfo_appinfo_h handle, void *user_data)
 {
@@ -601,6 +609,54 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 		return ret;
 	}
 
+	/*uri*/
+	pkgname = _svc_db_get_app(info.op, info.origin_mime, info.uri);
+	if(pkgname==NULL){
+		__get_list_with_condition_mime_extened_with_collation(info.op, info.uri,
+				info.mime, info.m_type, info.s_type, &pkg_list);
+		pkg_count = g_slist_length(pkg_list);
+		if(pkg_count > 0) {
+
+			if(info.uri_r_info) {
+				__get_list_with_condition_mime_extened(info.op, info.uri_r_info,
+					info.mime, info.m_type, info.s_type, &pkg_list);
+			}
+
+			__get_list_with_condition_mime_extened(info.op, info.scheme,
+				info.mime, info.m_type, info.s_type, &pkg_list);
+
+			if(info.category) {
+				__get_list_with_category(info.category, &pkg_list);
+			}
+
+			pkg_count = g_slist_length(pkg_list);
+			_D("pkg_count : %d", pkg_count);
+
+			if(pkg_count == 1){
+				pkgname = (char *)pkg_list->data;
+				if(pkgname != NULL){
+					ret = __run_svc_with_pkgname(pkgname, b, request_code, cbfunc, data);
+					goto end;
+				}
+			} else {
+				bundle_add(b, APP_SVC_K_URI_R_INFO, info.uri);
+				ret = __run_svc_with_pkgname(APP_SELECTOR, b, request_code, cbfunc, data);
+				goto end;
+			}
+			for (iter = pkg_list; iter != NULL; iter = g_slist_next(iter)) {
+				list_item = (char *)iter->data;
+				g_free(list_item);
+			}
+			g_slist_free(pkg_list);
+			pkg_list = NULL;
+		}
+	} else {
+		ret = __run_svc_with_pkgname(pkgname, b, request_code, cbfunc, data);
+		free(pkgname);
+		goto end;
+	}
+
+	/*scheme & host*/
 	if(info.uri_r_info) {
 		pkgname = _svc_db_get_app(info.op, info.origin_mime, info.uri_r_info);
 
@@ -626,7 +682,7 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 						goto end;
 					}
 				} else {
-					bundle_add(b, APP_SVC_K_URI_R_INFO, APP_SVC_V_SCHEME_AND_HOST);
+					bundle_add(b, APP_SVC_K_URI_R_INFO, info.uri_r_info);
 					ret = __run_svc_with_pkgname(APP_SELECTOR, b, request_code, cbfunc, data);
 					goto end;
 				}
@@ -643,7 +699,8 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 			goto end;
 		}
 	}
-	
+
+	/*scheme*/
 	pkgname = _svc_db_get_app(info.op, info.origin_mime, info.scheme);
 
 	if(pkgname==NULL){
@@ -666,7 +723,7 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 			__free_resolve_info_data(&info);
 			return APPSVC_RET_ENOMATCH;
 		} else {
-			bundle_add(b, APP_SVC_K_URI_R_INFO, APP_SVC_V_SCHEME);
+			bundle_add(b, APP_SVC_K_URI_R_INFO, info.scheme);
 			ret = __run_svc_with_pkgname(APP_SELECTOR, b, request_code, cbfunc, data);
 		}
 
@@ -714,6 +771,9 @@ SLPAPI int appsvc_get_list(bundle *b, appsvc_info_iter_fn iter_fn, void *data)
 	
 	_D("operation - %s / shceme - %s / mime - %s\n", info.op, info.scheme, info.mime);
 
+	__get_list_with_condition_mime_extened_with_collation(info.op, info.uri,
+			info.mime, info.m_type, info.s_type, &pkg_list);
+
 	if(info.uri_r_info) {
 		__get_list_with_condition_mime_extened(info.op, info.uri_r_info, 
 			info.mime, info.m_type, info.s_type, &pkg_list);
@@ -721,6 +781,10 @@ SLPAPI int appsvc_get_list(bundle *b, appsvc_info_iter_fn iter_fn, void *data)
 	
 	__get_list_with_condition_mime_extened(info.op, info.scheme, 
 		info.mime, info.m_type, info.s_type, &pkg_list);
+
+	if(info.category) {
+		__get_list_with_category(info.category, &pkg_list);
+	}
 
 	pkg_count = g_slist_length(pkg_list);
 	if (pkg_count == 0) {

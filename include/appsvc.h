@@ -97,11 +97,6 @@ extern "C" {
 /** APP SVC internal private key */
 #define APP_SVC_K_URI_R_INFO		"__APP_SVC_URI_R_INFO__"
 
-/** APP SVC internal private value */
-#define APP_SVC_V_SCHEME_AND_HOST		"__SCHEME_AND_HOST__"
-/** APP SVC internal private value */
-#define APP_SVC_V_SCHEME		"__SCHEME__"
-
 
 /**
  * @brief Return values in appsvc. 
