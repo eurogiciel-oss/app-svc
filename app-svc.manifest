@@ -1,12 +1,12 @@
 <manifest>
 	<define>
-		<domain name="appsvc"/>
+		<domain name="app-svc"/>
 		<provide>
-			<label name="appsvc::db"/>
+			<label name="app-svc::db"/>
 		</provide>
 	</define>
 	<request>
-		<domain name="appsvc"/>
+		<domain name="app-svc"/>
 	</request>
 	<assign>
 		<filesystem path="/usr/lib/libappsvc.so.0" label="_"/>
