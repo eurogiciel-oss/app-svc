@@ -28,7 +28,7 @@
 #include <dlog.h>
 
 #undef LOG_TAG
-#define LOG_TAG "APPSVC"
+#define LOG_TAG "APP_SVC"
 
 #define MAX_FILTER_STR_SIZE 1024
 #define MAX_PACKAGE_STR_SIZE 512
@@ -39,8 +39,8 @@
 #define MAX_OP_STR_SIZE 128
 #define MAX_LOCAL_BUFSZ 128
 
-#define _E(fmt, arg...) LOGE("[%s,%d] "fmt,__FUNCTION__,__LINE__,##arg)
-#define _D(fmt, arg...) LOGD("[%s,%d] "fmt,__FUNCTION__,__LINE__,##arg)
+#define _E(fmt, arg...) LOGE(fmt,##arg)
+#define _D(fmt, arg...) LOGD(fmt,##arg)
 
 #define retvm_if(expr, val, fmt, arg...) do { \
 	if(expr) { \
