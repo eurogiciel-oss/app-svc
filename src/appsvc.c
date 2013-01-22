@@ -549,7 +549,7 @@ static int __get_list_with_category(char *category, GSList **pkg_list)
 {
 	int ret;
 	pkgmgrinfo_appinfo_filter_h handle;
-	GSList *app_list;
+	GSList *app_list = NULL;
 	GSList *iter = NULL;
 	char *list_item = NULL;
 	int match;

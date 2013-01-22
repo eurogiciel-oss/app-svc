@@ -75,7 +75,8 @@ err:
 
 static int __collate_appsvc(void *ucol, int str1_len, const void *str1, int str2_len, const void *str2)
 {
-	char *saveptr1, *saveptr2;
+	char *saveptr1 = NULL;
+	char *saveptr2 = NULL;
 	char *dup_str1;
 	char *dup_str2;
 	char *token;
