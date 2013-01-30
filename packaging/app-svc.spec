@@ -1,4 +1,3 @@
-#sbs-git:slp/pkgs/a/app-svc app-svc 0.1.19 de68cdc468eaded317b4f5be9cdafebb01639aa0
 Name:	    app-svc
 Summary:    App svc
 Version: 0.1.42
@@ -43,13 +42,10 @@ App svc (developement files)
 
 
 %build
-
-CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" cmake . -DCMAKE_INSTALL_PREFIX=/usr
-
+%cmake .
 make %{?jobs:-j%jobs}
 
 %install
-rm -rf %{buildroot}
 %make_install
 
 
@@ -74,13 +70,13 @@ chsmack -a 'app-svc::db' /opt/dbspace/.appsvc.db-journal
 %defattr(-,root,root,-)
 /opt/share/appsvc_db.sql
 /usr/bin/appsvc_test
-/usr/lib/libappsvc.so.0
-/usr/lib/libappsvc.so.0.1.0
+%{_libdir}/libappsvc.so.0
+%{_libdir}/libappsvc.so.0.1.0
 
 %files devel
 %defattr(-,root,root,-)
-/usr/lib/pkgconfig/appsvc.pc
-/usr/lib/libappsvc.so
+%{_libdir}/pkgconfig/appsvc.pc
+%{_libdir}/libappsvc.so
 /usr/include/appsvc/appsvc.h
 
 
