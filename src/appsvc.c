@@ -625,6 +625,9 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 			__get_list_with_condition_mime_extened(info.op, info.scheme,
 				info.mime, info.m_type, info.s_type, &pkg_list);
 
+			__get_list_with_condition_mime_extened(info.op, "*",
+				info.mime, info.m_type, info.s_type, &pkg_list);
+
 			if(info.category) {
 				__get_list_with_category(info.category, &pkg_list);
 			}
@@ -668,6 +671,9 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 				__get_list_with_condition_mime_extened(info.op, info.scheme,
 					info.mime, info.m_type, info.s_type, &pkg_list);
 
+				__get_list_with_condition_mime_extened(info.op, "*",
+								info.mime, info.m_type, info.s_type, &pkg_list);
+
 				if(info.category) {
 					__get_list_with_category(info.category, &pkg_list);
 				}
@@ -706,6 +712,9 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 	if(pkgname==NULL){
 		__get_list_with_condition_mime_extened(info.op, info.scheme,
 			info.mime, info.m_type, info.s_type, &pkg_list);
+
+		__get_list_with_condition_mime_extened(info.op, "*",
+								info.mime, info.m_type, info.s_type, &pkg_list);
 
 		if(info.category) {
 			__get_list_with_category(info.category, &pkg_list);
