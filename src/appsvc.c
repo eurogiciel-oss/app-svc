@@ -499,17 +499,14 @@ static int __get_list_with_condition_mime_extened(char *op, char *uri, char *mim
 	tmp = malloc(MAX_MIME_STR_SIZE);
 
 	__get_list_with_condition(op, uri, mime, pkg_list);
-
 	if ((strncmp(mime, "NULL", 4) != 0) && (strncmp(s_type, "%", 1) != 0)) {
 		snprintf(tmp, MAX_MIME_STR_SIZE-1, "%s/*", m_type);
 		__get_list_with_condition(op, uri, tmp, pkg_list);
 	}
-
 	if ((strncmp(mime, "NULL", 4) != 0) && (strncmp(m_type, "%", 1) != 0)) {
 		snprintf(tmp, MAX_MIME_STR_SIZE-1, "*/*");
 		__get_list_with_condition(op, uri, tmp, pkg_list);
 	}
-
 	free(tmp);
 
 	return 0;
@@ -518,7 +515,20 @@ static int __get_list_with_condition_mime_extened(char *op, char *uri, char *mim
 static int __get_list_with_condition_mime_extened_with_collation(char *op, char *uri, char *mime,
 	char *m_type, char *s_type, GSList **pkg_list)
 {
+	char *tmp;
+
+	tmp = malloc(MAX_MIME_STR_SIZE);
+
 	_svc_db_get_list_with_collation(op, uri, mime, pkg_list);
+	if ((strncmp(mime, "NULL", 4) != 0) && (strncmp(s_type, "%", 1) != 0)) {
+		snprintf(tmp, MAX_MIME_STR_SIZE-1, "%s/*", m_type);
+		_svc_db_get_list_with_collation(op, uri, tmp, pkg_list);
+	}
+	if ((strncmp(mime, "NULL", 4) != 0) && (strncmp(m_type, "%", 1) != 0)) {
+		snprintf(tmp, MAX_MIME_STR_SIZE-1, "*/*");
+		_svc_db_get_list_with_collation(op, uri, tmp, pkg_list);
+	}
+	free(tmp);
 
 	return 0;
 }
