@@ -602,22 +602,22 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 		return APPSVC_RET_EINVAL;
 	}
 
-	memset(&info, 0, sizeof(appsvc_resolve_info_t));
-	ret = __get_resolve_info(b, &info);
-	if(ret < 0)
-		return ret;
-
-	pkgname = info.pkgname;
-	_D("op - %s / mime - %s / shceme - %s\n", info.op, info.origin_mime, info.scheme);
+	pkgname = (char *)appsvc_get_pkgname(b);
 
 	/* explict*/
 	if(pkgname) {
 		if(appsvc_get_operation(b) == NULL)
 			appsvc_set_operation(b,APPSVC_OPERATION_DEFAULT);
 		ret = __run_svc_with_pkgname(pkgname, b, request_code, cbfunc, data);
-		__free_resolve_info_data(&info);
 		return ret;
 	}
+
+	memset(&info, 0, sizeof(appsvc_resolve_info_t));
+	ret = __get_resolve_info(b, &info);
+	if(ret < 0)
+		return ret;
+
+	_D("op - %s / mime - %s / shceme - %s\n", info.op, info.origin_mime, info.scheme);
 
 	/*uri*/
 	pkgname = _svc_db_get_app(info.op, info.origin_mime, info.uri);
