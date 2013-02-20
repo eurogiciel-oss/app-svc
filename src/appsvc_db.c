@@ -205,7 +205,7 @@ int _svc_db_add_app(const char *op, const char *mime_type, const char *uri, cons
 	else 
 		strncpy(u,uri,BUF_MAX_LEN-1);
 	
-	sprintf(query,"insert into appsvc( operation, mime_type, uri, pkg_name) \
+	snprintf(query, BUF_MAX_LEN, "insert into appsvc( operation, mime_type, uri, pkg_name) \
 		values('%s','%s','%s','%s')",op,m,u,pkg_name);
 
 	if (SQLITE_OK != sqlite3_exec(svc_db, query, NULL, NULL, &error_message))
@@ -309,7 +309,7 @@ char* _svc_db_get_app(const char *op, const char *mime_type, const char *uri)
 		return NULL;
 	
 	
-	sprintf(query,"select pkg_name from appsvc where operation='%s' and mime_type='%s' and uri='%s'",\
+	snprintf(query, BUF_MAX_LEN, "select pkg_name from appsvc where operation='%s' and mime_type='%s' and uri='%s'",\
 				op,m,u);
 
 	_D("query : %s\n",query);
@@ -352,7 +352,7 @@ int _svc_db_get_list_with_collation(char *op, char *uri, char *mime, GSList **pk
 	if(__init_app_info_db()<0)
 		return 0;
 
-	sprintf(query,"select package from app_info where x_slp_svc='%s|%s|%s' collate appsvc_collation", op,uri,mime);
+	snprintf(query, BUF_MAX_LEN, "select package from app_info where x_slp_svc='%s|%s|%s' collate appsvc_collation", op,uri,mime);
 	_D("query : %s\n",query);
 
 	ret = sqlite3_prepare(app_info_db, query, strlen(query), &stmt, NULL);

@@ -1,6 +1,6 @@
 Name:	    app-svc
 Summary:    App svc
-Version: 0.1.45
+Version: 0.1.46
 Release:    1
 Group:      System/Libraries
 License:    Apache License, Version 2.0
