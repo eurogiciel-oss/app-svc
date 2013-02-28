@@ -32,7 +32,8 @@
 #define SVC_DB_PATH	"/opt/dbspace/.appsvc.db"
 #define APP_INFO_DB_PATH	"/opt/dbspace/.app_info.db"
 
-#define QUERY_MAXLEN	4096
+#define QUERY_MAX_LEN	8192
+#define URI_MAX_LEN	4096
 #define BUF_MAX_LEN	1024
 
 #define APPSVC_COLLATION "appsvc_collation"
@@ -185,8 +186,8 @@ static int __fini(void)
 int _svc_db_add_app(const char *op, const char *mime_type, const char *uri, const char *pkg_name)
 {
 	char m[BUF_MAX_LEN];
-	char u[BUF_MAX_LEN];
-	char query[BUF_MAX_LEN];
+	char u[URI_MAX_LEN];
+	char query[QUERY_MAX_LEN];
 	char* error_message = NULL;
 
 	if(__init()<0)
@@ -201,11 +202,11 @@ int _svc_db_add_app(const char *op, const char *mime_type, const char *uri, cons
 		strncpy(m,mime_type,BUF_MAX_LEN-1);
 
 	if(uri==NULL)
-		strncpy(u,"NULL",BUF_MAX_LEN-1);
+		strncpy(u,"NULL",URI_MAX_LEN-1);
 	else 
-		strncpy(u,uri,BUF_MAX_LEN-1);
-	
-	snprintf(query, BUF_MAX_LEN, "insert into appsvc( operation, mime_type, uri, pkg_name) \
+		strncpy(u,uri,URI_MAX_LEN-1);
+
+	snprintf(query, QUERY_MAX_LEN, "insert into appsvc( operation, mime_type, uri, pkg_name) \
 		values('%s','%s','%s','%s')",op,m,u,pkg_name);
 
 	if (SQLITE_OK != sqlite3_exec(svc_db, query, NULL, NULL, &error_message))
@@ -220,7 +221,7 @@ int _svc_db_add_app(const char *op, const char *mime_type, const char *uri, cons
 
 int _svc_db_delete_with_pkgname(const char *pkg_name)
 {
-	char query[BUF_MAX_LEN];
+	char query[QUERY_MAX_LEN];
 	char* error_message = NULL;
 	
 	if(pkg_name == NULL) {
@@ -231,7 +232,7 @@ int _svc_db_delete_with_pkgname(const char *pkg_name)
 	if(__init()<0)
 		return -1;
 
-	snprintf(query, BUF_MAX_LEN, "delete from appsvc where pkg_name = '%s';", pkg_name);
+	snprintf(query, QUERY_MAX_LEN, "delete from appsvc where pkg_name = '%s';", pkg_name);
 
 	if (SQLITE_OK != sqlite3_exec(svc_db, query, NULL, NULL, &error_message))
 	{
@@ -246,7 +247,7 @@ int _svc_db_delete_with_pkgname(const char *pkg_name)
 
 int _svc_db_is_defapp(const char *pkg_name)
 {
-	char query[BUF_MAX_LEN];
+	char query[QUERY_MAX_LEN];
 	sqlite3_stmt *stmt;
 	int cnt = 0;
 	int ret = -1;
@@ -259,7 +260,7 @@ int _svc_db_is_defapp(const char *pkg_name)
 	if(__init()<0)
 		return 0;
 
-	snprintf(query, BUF_MAX_LEN,
+	snprintf(query, QUERY_MAX_LEN,
 		"select count(*) from appsvc where pkg_name = '%s';", pkg_name);
 
 	ret = sqlite3_prepare(svc_db, query, sizeof(query), &stmt, NULL);
@@ -283,8 +284,8 @@ int _svc_db_is_defapp(const char *pkg_name)
 char* _svc_db_get_app(const char *op, const char *mime_type, const char *uri)
 {
 	char m[BUF_MAX_LEN];
-	char u[BUF_MAX_LEN];
-	char query[BUF_MAX_LEN];
+	char u[URI_MAX_LEN];
+	char query[QUERY_MAX_LEN];
 	sqlite3_stmt* stmt;
 	int ret;
 	char* pkgname;
@@ -298,9 +299,9 @@ char* _svc_db_get_app(const char *op, const char *mime_type, const char *uri)
 		strncpy(m,mime_type,BUF_MAX_LEN-1);
 
 	if(uri==NULL)
-		strncpy(u,"NULL",BUF_MAX_LEN-1);
+		strncpy(u,"NULL",URI_MAX_LEN-1);
 	else 
-		strncpy(u,uri,BUF_MAX_LEN-1);
+		strncpy(u,uri,URI_MAX_LEN-1);
 
 //	if(doubt_sql_injection(mime_type))
 //		return NULL;
@@ -309,7 +310,7 @@ char* _svc_db_get_app(const char *op, const char *mime_type, const char *uri)
 		return NULL;
 	
 	
-	snprintf(query, BUF_MAX_LEN, "select pkg_name from appsvc where operation='%s' and mime_type='%s' and uri='%s'",\
+	snprintf(query, QUERY_MAX_LEN, "select pkg_name from appsvc where operation='%s' and mime_type='%s' and uri='%s'",\
 				op,m,u);
 
 	_D("query : %s\n",query);
@@ -341,7 +342,7 @@ char* _svc_db_get_app(const char *op, const char *mime_type, const char *uri)
 
 int _svc_db_get_list_with_collation(char *op, char *uri, char *mime, GSList **pkg_list)
 {
-	char query[BUF_MAX_LEN];
+	char query[QUERY_MAX_LEN];
 	sqlite3_stmt* stmt;
 	int ret;
 	GSList *iter = NULL;
@@ -352,7 +353,7 @@ int _svc_db_get_list_with_collation(char *op, char *uri, char *mime, GSList **pk
 	if(__init_app_info_db()<0)
 		return 0;
 
-	snprintf(query, BUF_MAX_LEN, "select package from app_info where x_slp_svc='%s|%s|%s' collate appsvc_collation", op,uri,mime);
+	snprintf(query, QUERY_MAX_LEN, "select package from app_info where x_slp_svc='%s|%s|%s' collate appsvc_collation", op,uri,mime);
 	_D("query : %s\n",query);
 
 	ret = sqlite3_prepare(app_info_db, query, strlen(query), &stmt, NULL);
