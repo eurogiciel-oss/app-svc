@@ -102,6 +102,7 @@ extern "C" {
  * @brief Return values in appsvc. 
  */
 typedef enum _appsvc_return_val {
+	APPSVC_RET_EILLACC = -5,		/**< Illegal Access */
 	APPSVC_RET_ELAUNCH = -4,		/**< Failure on launching the app */
 	APPSVC_RET_ENOMATCH = -3,		/**< No matching result Error */
 	APPSVC_RET_EINVAL = -2,			/**< Invalid argument */
