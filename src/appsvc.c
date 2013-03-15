@@ -196,8 +196,11 @@ static int __run_svc_with_pkgname(char *pkgname, bundle *b, int request_code, ap
 
 		cb_info = __create_rescb(request_code, cbfunc, data);
 		ret = aul_launch_app_with_result(pkgname, b, __aul_cb, cb_info);
-		if(ret < 0)
+		if(ret == AUL_R_EILLACC) {
+			ret = APPSVC_RET_EILLACC;
+		} else if(ret < 0) {
 			ret = APPSVC_RET_ELAUNCH;
+		}
 	} else {
 		_D("pkg_name : %s - no result", pkgname);
 		ret = aul_launch_app(pkgname, b);
@@ -499,17 +502,14 @@ static int __get_list_with_condition_mime_extened(char *op, char *uri, char *mim
 	tmp = malloc(MAX_MIME_STR_SIZE);
 
 	__get_list_with_condition(op, uri, mime, pkg_list);
-
 	if ((strncmp(mime, "NULL", 4) != 0) && (strncmp(s_type, "%", 1) != 0)) {
 		snprintf(tmp, MAX_MIME_STR_SIZE-1, "%s/*", m_type);
 		__get_list_with_condition(op, uri, tmp, pkg_list);
 	}
-
 	if ((strncmp(mime, "NULL", 4) != 0) && (strncmp(m_type, "%", 1) != 0)) {
 		snprintf(tmp, MAX_MIME_STR_SIZE-1, "*/*");
 		__get_list_with_condition(op, uri, tmp, pkg_list);
 	}
-
 	free(tmp);
 
 	return 0;
@@ -518,7 +518,20 @@ static int __get_list_with_condition_mime_extened(char *op, char *uri, char *mim
 static int __get_list_with_condition_mime_extened_with_collation(char *op, char *uri, char *mime,
 	char *m_type, char *s_type, GSList **pkg_list)
 {
+	char *tmp;
+
+	tmp = malloc(MAX_MIME_STR_SIZE);
+
 	_svc_db_get_list_with_collation(op, uri, mime, pkg_list);
+	if ((strncmp(mime, "NULL", 4) != 0) && (strncmp(s_type, "%", 1) != 0)) {
+		snprintf(tmp, MAX_MIME_STR_SIZE-1, "%s/*", m_type);
+		_svc_db_get_list_with_collation(op, uri, tmp, pkg_list);
+	}
+	if ((strncmp(mime, "NULL", 4) != 0) && (strncmp(m_type, "%", 1) != 0)) {
+		snprintf(tmp, MAX_MIME_STR_SIZE-1, "*/*");
+		_svc_db_get_list_with_collation(op, uri, tmp, pkg_list);
+	}
+	free(tmp);
 
 	return 0;
 }
@@ -592,22 +605,22 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 		return APPSVC_RET_EINVAL;
 	}
 
-	memset(&info, 0, sizeof(appsvc_resolve_info_t));
-	ret = __get_resolve_info(b, &info);
-	if(ret < 0)
-		return ret;
-
-	pkgname = info.pkgname;
-	_D("op - %s / mime - %s / shceme - %s\n", info.op, info.origin_mime, info.scheme);
+	pkgname = (char *)appsvc_get_pkgname(b);
 
 	/* explict*/
 	if(pkgname) {
 		if(appsvc_get_operation(b) == NULL)
 			appsvc_set_operation(b,APPSVC_OPERATION_DEFAULT);
 		ret = __run_svc_with_pkgname(pkgname, b, request_code, cbfunc, data);
-		__free_resolve_info_data(&info);
 		return ret;
 	}
+
+	memset(&info, 0, sizeof(appsvc_resolve_info_t));
+	ret = __get_resolve_info(b, &info);
+	if(ret < 0)
+		return ret;
+
+	_D("op - %s / mime - %s / shceme - %s\n", info.op, info.origin_mime, info.scheme);
 
 	/*uri*/
 	pkgname = _svc_db_get_app(info.op, info.origin_mime, info.uri);
@@ -623,6 +636,9 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 			}
 
 			__get_list_with_condition_mime_extened(info.op, info.scheme,
+				info.mime, info.m_type, info.s_type, &pkg_list);
+
+			__get_list_with_condition_mime_extened(info.op, "*",
 				info.mime, info.m_type, info.s_type, &pkg_list);
 
 			if(info.category) {
@@ -668,6 +684,9 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 				__get_list_with_condition_mime_extened(info.op, info.scheme,
 					info.mime, info.m_type, info.s_type, &pkg_list);
 
+				__get_list_with_condition_mime_extened(info.op, "*",
+								info.mime, info.m_type, info.s_type, &pkg_list);
+
 				if(info.category) {
 					__get_list_with_category(info.category, &pkg_list);
 				}
@@ -706,6 +725,9 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 	if(pkgname==NULL){
 		__get_list_with_condition_mime_extened(info.op, info.scheme,
 			info.mime, info.m_type, info.s_type, &pkg_list);
+
+		__get_list_with_condition_mime_extened(info.op, "*",
+								info.mime, info.m_type, info.s_type, &pkg_list);
 
 		if(info.category) {
 			__get_list_with_category(info.category, &pkg_list);
