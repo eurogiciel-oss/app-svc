@@ -75,6 +75,20 @@ extern "C" {
 #define APPSVC_OPERATION_SEARCH			"http://tizen.org/appcontrol/operation/search"
 /** APP_SVC OPERATION TYPE*/
 #define APPSVC_OPERATION_DOWNLOAD		"http://tizen.org/appcontrol/operation/download"
+/** APP_SVC OPERATION TYPE*/
+#define APPSVC_OPERATION_SHARE			"http://tizen.org/appcontrol/operation/share"
+/** APP_SVC OPERATION TYPE*/
+#define APPSVC_OPERATION_MULTI_SHARE	"http://tizen.org/appcontrol/operation/multi_share"
+/** APP_SVC OPERATION TYPE*/
+#define APPSVC_OPERATION_COMPOSE		"http://tizen.org/appcontorl/opeation/compose"
+/** APP_SVC OPERATION TYPE*/
+#define APPSVC_OPERATION_LOCATION		"http://tizen.org/appcontrol/operation/configure/location"
+/** APP_SVC OPERATION TYPE*/
+#define APPSVC_OPERATION_FONT_TYPE		"http://tizen.org/appcontrol/operation/configure/font/type"
+/** APP_SVC OPERATION TYPE*/
+#define APPSVC_OPERATION_FONT_SIZE		"http://tizen.org/appcontrol/operation/configure/font/size"
+
+
 
 
 /** APP_SVC DATA SUBJECT*/
@@ -93,6 +107,13 @@ extern "C" {
 #define APPSVC_DATA_SELECTED		"http://tizen.org/appcontrol/data/selected"
 /** APP_SVC DATA TYPE*/
 #define APPSVC_DATA_KEYWORD		"http://tizen.org/appcontrol/data/keyword"
+/** APP_SVC DATA TYPE*/
+#define APPSVC_DATA_PATH		"http://tizen.org/appcontrol/data/path"
+/** APP_SVC DATA TYPE*/
+#define APPSVC_DATA_SELECTION_MODE	"http://tizen.org/appcontrol/data/selection_mode"
+/** APP_SVC DATA TYPE*/
+#define APPSVC_DATA_RETURN_RESULT	"http://tizen.org/appcontrol/data/return_result"
+
 
 /** APP SVC internal private key */
 #define APP_SVC_K_URI_R_INFO		"__APP_SVC_URI_R_INFO__"
