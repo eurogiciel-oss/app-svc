@@ -41,8 +41,6 @@
 
 
 
-#define APP_SELECTOR "org.tizen.app-selector"
-
 #ifndef SLPAPI
 #define SLPAPI __attribute__ ((visibility("default")))
 #endif
