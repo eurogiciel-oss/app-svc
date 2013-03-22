@@ -118,6 +118,7 @@ extern "C" {
 /** APP SVC internal private key */
 #define APP_SVC_K_URI_R_INFO		"__APP_SVC_URI_R_INFO__"
 
+#define APP_SELECTOR "org.tizen.app-selector"
 
 /**
  * @brief Return values in appsvc. 
