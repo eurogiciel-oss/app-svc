@@ -80,7 +80,7 @@ extern "C" {
 /** APP_SVC OPERATION TYPE*/
 #define APPSVC_OPERATION_MULTI_SHARE	"http://tizen.org/appcontrol/operation/multi_share"
 /** APP_SVC OPERATION TYPE*/
-#define APPSVC_OPERATION_COMPOSE		"http://tizen.org/appcontorl/opeation/compose"
+#define APPSVC_OPERATION_COMPOSE		"http://tizen.org/appcontrol/opeation/compose"
 /** APP_SVC OPERATION TYPE*/
 #define APPSVC_OPERATION_LOCATION		"http://tizen.org/appcontrol/operation/configure/location"
 /** APP_SVC OPERATION TYPE*/
