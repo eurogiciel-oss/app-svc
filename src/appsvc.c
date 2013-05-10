@@ -194,16 +194,22 @@ static int __run_svc_with_pkgname(char *pkgname, bundle *b, int request_code, ap
 
 		cb_info = __create_rescb(request_code, cbfunc, data);
 		ret = aul_launch_app_with_result(pkgname, b, __aul_cb, cb_info);
-		if(ret == AUL_R_EILLACC) {
-			ret = APPSVC_RET_EILLACC;
-		} else if(ret < 0) {
-			ret = APPSVC_RET_ELAUNCH;
-		}
 	} else {
 		_D("pkg_name : %s - no result", pkgname);
 		ret = aul_launch_app(pkgname, b);
-		if(ret < 0)
-			ret = APPSVC_RET_ELAUNCH;
+	}
+
+	if(ret < 0) {
+		switch (ret) {
+			case AUL_R_EILLACC:
+				ret = APPSVC_RET_EILLACC;
+				break;
+			case AUL_R_EINVAL:
+				ret = APPSVC_RET_EINVAL;
+				break;
+			default:
+				ret = APPSVC_RET_ELAUNCH;
+		}
 	}
 
 	return ret;
