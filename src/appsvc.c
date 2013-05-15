@@ -230,21 +230,21 @@ static int __get_resolve_info(bundle *b, appsvc_resolve_info_t *info)
 	if(info->uri) {
 		if(strncmp(info->uri,"/",1) == 0){
 			if(!info->mime) {
-				info->mime = malloc(MAX_MIME_STR_SIZE);
+				info->origin_mime = info->mime = malloc(MAX_MIME_STR_SIZE);
 				aul_get_mime_from_file(info->uri, info->mime, MAX_MIME_STR_SIZE);
 				info->mime_set = 1;
 			}
 			info->uri = NULL;			
 		} else if(strncmp(info->uri,"file:/",6)==0){
 			if(!info->mime) {
-				info->mime = malloc(MAX_MIME_STR_SIZE);
+				info->origin_mime = info->mime = malloc(MAX_MIME_STR_SIZE);
 				aul_get_mime_from_file(&info->uri[5], info->mime, MAX_MIME_STR_SIZE);
 				info->mime_set = 1;
 			}
 			info->uri = NULL;
 		} else if(strncmp(info->uri,"file:///",8) == 0){
 			if(!info->mime) {
-				info->mime = malloc(MAX_MIME_STR_SIZE);
+				info->origin_mime = info->mime = malloc(MAX_MIME_STR_SIZE);
 				aul_get_mime_from_file(&info->uri[7], info->mime, MAX_MIME_STR_SIZE);	
 				info->mime_set = 1;
 			}
@@ -298,8 +298,7 @@ static int __get_resolve_info(bundle *b, appsvc_resolve_info_t *info)
 			strncpy(info->s_type, "%", MAX_LOCAL_BUFSZ-1);	
 		}
 
-		if(!info->mime_set)
-			info->mime = malloc(MAX_MIME_STR_SIZE);
+		info->mime = malloc(MAX_MIME_STR_SIZE);
 		snprintf(info->mime, MAX_MIME_STR_SIZE-1, "%s/%s", info->m_type, info->s_type);
 	}
 
@@ -320,6 +319,8 @@ static int __free_resolve_info_data(appsvc_resolve_info_t *info)
 		free(info->s_type);
 	if (info->uri_r_info)
 		free(info->uri_r_info);
+	if (info->mime_set)
+		free(info->origin_mime);
 	
 	return 0;
 }
