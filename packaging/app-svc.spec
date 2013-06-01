@@ -1,17 +1,15 @@
 Name:	    app-svc
-Summary:    App svc
+Summary:    Application Service
 Version: 0.1.50
 Release:    1
-Group:      System/Libraries
-License:    Apache License, Version 2.0
+Group:      Application Framework/Service
+License:    Apache-2.0
 Source0:    %{name}-%{version}.tar.gz
 
 Requires(post): /sbin/ldconfig
+Requires(post): sqlite3
 Requires(postun): /sbin/ldconfig
-
-
 BuildRequires: cmake
-
 BuildRequires: pkgconfig(dlog)
 BuildRequires: pkgconfig(ecore) 
 BuildRequires: pkgconfig(x11)
@@ -28,14 +26,14 @@ BuildRequires: pkgconfig(pkgmgr-info)
 
 
 %description
-App svc
+Application Service
 
 %package devel
 Summary:    App svc
-Group:      Development/Libraries
+Group:      Development/Application Framework
 Requires:   %{name} = %{version}-%{release}
 %description devel
-App svc (developement files)
+%devel_desc
 
 %prep
 %setup -q
@@ -50,9 +48,8 @@ make %{?jobs:-j%jobs}
 
 
 %post
-
 /sbin/ldconfig
-mkdir -p /opt/dbspace
+
 sqlite3 /opt/dbspace/.appsvc.db < /opt/share/appsvc_db.sql
 rm -rf /opt/share/appsvc_db.sql
 
@@ -66,6 +63,7 @@ chsmack -a 'app-svc::db' /opt/dbspace/.appsvc.db-journal
 %postun -p /sbin/ldconfig
 
 %files
+%license LICENSE
 %manifest app-svc.manifest
 %defattr(-,root,root,-)
 /opt/share/appsvc_db.sql
