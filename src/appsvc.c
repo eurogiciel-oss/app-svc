@@ -65,6 +65,7 @@ typedef struct _appsvc_resolve_info_t{
 	char *m_type;
 	char *s_type;
 	char *category;
+	char *win_id;
 	int mime_set;
 }appsvc_resolve_info_t;
 
@@ -997,6 +998,18 @@ static Eina_Bool __transient_cb(void *data, int type, void *event)
 	return ECORE_CALLBACK_RENEW;
 }
 
+int __aul_subapp_cb(void *data)
+{
+	appsvc_transient_cb_info_t*  cb_info;
+
+	cb_info = (appsvc_transient_cb_info_t*) data;
+
+	cb_info->cb_func(cb_info->data);
+	ecore_main_loop_quit();
+
+	return 0;
+}
+
 SLPAPI int appsvc_allow_transient_app(bundle *b, Ecore_X_Window id)
 {
 	char win_id[MAX_LOCAL_BUFSZ];
@@ -1037,7 +1050,13 @@ SLPAPI int appsvc_request_transient_app(bundle *b, Ecore_X_Window callee_id, app
 	info->data = data;
 
 	ecore_event_handler_add(ECORE_X_EVENT_WINDOW_DESTROY, __transient_cb, info);
+	aul_set_subapp(__aul_subapp_cb, info);
 
 	return 0;
+}
+
+SLPAPI int appsvc_subapp_terminate_request_pid(int pid)
+{
+	return aul_subapp_terminate_request_pid(pid);
 }
 

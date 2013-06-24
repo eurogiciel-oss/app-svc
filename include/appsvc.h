@@ -953,6 +953,7 @@ int appsvc_is_defapp(const char *appid);
 */
 int appsvc_data_is_array(bundle *b, const char *key);
 
+int appsvc_subapp_terminate_request_pid(int pid);
 
 #ifdef __cplusplus
 	}
