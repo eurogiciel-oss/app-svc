@@ -57,8 +57,6 @@ chown 0:5000 /opt/dbspace/.appsvc.db
 chown 0:5000 /opt/dbspace/.appsvc.db-journal
 chmod 664 /opt/dbspace/.appsvc.db
 chmod 664 /opt/dbspace/.appsvc.db-journal
-chsmack -a 'app-svc::db' /opt/dbspace/.appsvc.db
-chsmack -a 'app-svc::db' /opt/dbspace/.appsvc.db-journal
 
 %postun -p /sbin/ldconfig
 
