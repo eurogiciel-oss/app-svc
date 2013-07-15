@@ -1,3 +1,6 @@
+* Mon Jul 15 2013 Markus Lehtonen <markus.lehtonen@linux.intel.com> submit/tizen/20130621.062843@d15a8b6
+- Include database in package files instead of creating it in %post (TZPC-3631)
+
 * Thu Jun 20 2013 José Bollo <jose.bollo@eurogiciel.fr> accepted/tizen/20130602.015259@a26a0be
 - cleanup
 

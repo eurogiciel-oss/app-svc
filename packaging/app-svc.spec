@@ -8,9 +8,9 @@ Source0:    %{name}-%{version}.tar.gz
 Source1001: 	app-svc.manifest
 
 Requires(post): /sbin/ldconfig
-Requires(post): sqlite3
 Requires(postun): /sbin/ldconfig
 BuildRequires: cmake
+BuildRequires: sqlite3
 BuildRequires: pkgconfig(dlog)
 BuildRequires: pkgconfig(ecore) 
 BuildRequires: pkgconfig(x11)
@@ -48,17 +48,11 @@ make %{?jobs:-j%jobs}
 %install
 %make_install
 
+# Create database
+mkdir -p %{buildroot}/opt/dbspace
+sqlite3 %{buildroot}/opt/dbspace/.appsvc.db < data/appsvc_db.sql
 
-%post
-/sbin/ldconfig
-
-sqlite3 /opt/dbspace/.appsvc.db < /opt/share/appsvc_db.sql
-rm -rf /opt/share/appsvc_db.sql
-
-chown 0:5000 /opt/dbspace/.appsvc.db
-chown 0:5000 /opt/dbspace/.appsvc.db-journal
-chmod 664 /opt/dbspace/.appsvc.db
-chmod 664 /opt/dbspace/.appsvc.db-journal
+%post -p /sbin/ldconfig
 
 %postun -p /sbin/ldconfig
 
@@ -67,7 +61,8 @@ chmod 664 /opt/dbspace/.appsvc.db-journal
 %license LICENSE
 %manifest app-svc.manifest
 %defattr(-,root,root,-)
-/opt/share/appsvc_db.sql
+%config(noreplace) %verify(not md5 mtime size) %attr(664,0,5000) /opt/dbspace/.appsvc.db
+%config(noreplace) %verify(not md5 mtime size) %attr(664,0,5000) /opt/dbspace/.appsvc.db-journal
 /usr/bin/appsvc_test
 %{_libdir}/libappsvc.so.0
 %{_libdir}/libappsvc.so.0.1.0

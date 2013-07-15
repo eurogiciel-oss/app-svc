@@ -85,8 +85,6 @@ INSTALL(TARGETS ${AVATAR_NAME} DESTINATION bin)
 INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/appsvc.h DESTINATION include/appsvc)
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/appsvc.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
 
-INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/appsvc_db.sql DESTINATION /opt/share )
-
 # test
 add_subdirectory(test)
 
