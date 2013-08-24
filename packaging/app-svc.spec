@@ -57,21 +57,20 @@ sqlite3 %{buildroot}/opt/dbspace/.appsvc.db < data/appsvc_db.sql
 %postun -p /sbin/ldconfig
 
 %files
+%defattr(-,root,root,-)
 %manifest %{name}.manifest
 %license LICENSE
-%manifest app-svc.manifest
-%defattr(-,root,root,-)
-%config(noreplace) %verify(not md5 mtime size) %attr(664,0,5000) /opt/dbspace/.appsvc.db
-%config(noreplace) %verify(not md5 mtime size) %attr(664,0,5000) /opt/dbspace/.appsvc.db-journal
+%config(noreplace) %verify(not md5 mtime size) %attr(664,root,app) /opt/dbspace/.appsvc.db
+%config(noreplace) %verify(not md5 mtime size) %attr(664,root,app) /opt/dbspace/.appsvc.db-journal
 /usr/bin/appsvc_test
 %{_libdir}/libappsvc.so.0
 %{_libdir}/libappsvc.so.0.1.0
 
 %files devel
-%manifest %{name}.manifest
 %defattr(-,root,root,-)
+%manifest %{name}.manifest
 %{_libdir}/pkgconfig/appsvc.pc
 %{_libdir}/libappsvc.so
-/usr/include/appsvc/appsvc.h
+%{_includedir}/appsvc/appsvc.h
 
 
