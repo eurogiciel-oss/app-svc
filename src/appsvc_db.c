@@ -49,7 +49,7 @@ static sqlite3 *app_info_db = NULL;
 static int __init(void)
 {
 	int rc;
-	
+
 	if (svc_db) {
 		_D("Already initialized\n");
 		return 0;
@@ -198,12 +198,12 @@ int _svc_db_add_app(const char *op, const char *mime_type, const char *uri, cons
 
 	if(mime_type==NULL)
 		strncpy(m,"NULL",BUF_MAX_LEN-1);
-	else 
+	else
 		strncpy(m,mime_type,BUF_MAX_LEN-1);
 
 	if(uri==NULL)
 		strncpy(u,"NULL",URI_MAX_LEN-1);
-	else 
+	else
 		strncpy(u,uri,URI_MAX_LEN-1);
 
 	snprintf(query, QUERY_MAX_LEN, "insert into appsvc( operation, mime_type, uri, pkg_name) \
@@ -214,7 +214,7 @@ int _svc_db_add_app(const char *op, const char *mime_type, const char *uri, cons
 	 	_E("Don't execute query = %s, error message = %s\n", query, error_message);
 		return -1;
 	}
-	
+
 	__fini();
 	return 0;
 }
@@ -223,7 +223,7 @@ int _svc_db_delete_with_pkgname(const char *pkg_name)
 {
 	char query[QUERY_MAX_LEN];
 	char* error_message = NULL;
-	
+
 	if(pkg_name == NULL) {
 		_E("Invalid argument: data to delete is NULL\n");
 		return -1;
@@ -239,7 +239,7 @@ int _svc_db_delete_with_pkgname(const char *pkg_name)
 	 	_E("Don't execute query = %s, error message = %s\n", query, error_message);
 		return -1;
 	}
-		
+
 	__fini();
 
 	return 0;
@@ -251,7 +251,7 @@ int _svc_db_is_defapp(const char *pkg_name)
 	sqlite3_stmt *stmt;
 	int cnt = 0;
 	int ret = -1;
-	
+
 	if(pkg_name == NULL) {
 		_E("Invalid argument: data to delete is NULL\n");
 		return 0;
@@ -273,7 +273,7 @@ int _svc_db_is_defapp(const char *pkg_name)
 		cnt = sqlite3_column_int(stmt, 0);
 	}
 	sqlite3_finalize(stmt);
-		
+
 	__fini();
 
 	if(cnt < 1) return 0;
@@ -289,27 +289,28 @@ char* _svc_db_get_app(const char *op, const char *mime_type, const char *uri)
 	sqlite3_stmt* stmt;
 	int ret;
 	char* pkgname;
+	char* ret_val = NULL;
 
 	if(op == NULL )
 		return NULL;
 
 	if(mime_type==NULL)
 		strncpy(m,"NULL",BUF_MAX_LEN-1);
-	else 
+	else
 		strncpy(m,mime_type,BUF_MAX_LEN-1);
 
 	if(uri==NULL)
 		strncpy(u,"NULL",URI_MAX_LEN-1);
-	else 
+	else
 		strncpy(u,uri,URI_MAX_LEN-1);
 
 //	if(doubt_sql_injection(mime_type))
 //		return NULL;
-	
+
 	if(__init() < 0)
 		return NULL;
-	
-	
+
+
 	snprintf(query, QUERY_MAX_LEN, "select pkg_name from appsvc where operation='%s' and mime_type='%s' and uri='%s'",\
 				op,m,u);
 
@@ -318,26 +319,34 @@ char* _svc_db_get_app(const char *op, const char *mime_type, const char *uri)
 	ret = sqlite3_prepare(svc_db, query, strlen(query), &stmt, NULL);
 
 	if ( ret != SQLITE_OK) {
-		_E("prepare error\n");
-		return NULL;
+		_E("prepare error(%d)\n", ret);
+		goto db_fini;
 	}
 
 	ret = sqlite3_step(stmt);
-	if (ret == SQLITE_DONE) {
-		return NULL;
+	if (ret != SQLITE_ROW) {
+		_D("no result");
+		goto stmt_finialize;
 	}
 
-	pkgname = malloc(BUF_MAX_LEN);
-	strncpy(pkgname, (const char *)sqlite3_column_text(stmt, 0),BUF_MAX_LEN-1);
-	//pkgname = (char*) sqlite3_column_text(stmt, 0);
+	pkgname = (char*) sqlite3_column_text(stmt, 0);
+	if(pkgname) {
+		ret_val = malloc(BUF_MAX_LEN);
+		strncpy(ret_val, (const char *)sqlite3_column_text(stmt, 0),BUF_MAX_LEN-1);
+	}
 
 	_D("pkgname : %s\n",pkgname);
-	
-	ret = sqlite3_finalize(stmt);
 
+stmt_finialize :
+	ret = sqlite3_finalize(stmt);
+	if ( ret != SQLITE_OK) {
+		_D("finalize error(%d)", ret);
+	}
+
+db_fini :
 	__fini();
 
-	return pkgname;
+	return ret_val;
 }
 
 int _svc_db_get_list_with_collation(char *op, char *uri, char *mime, GSList **pkg_list)
