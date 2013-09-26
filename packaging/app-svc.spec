@@ -48,6 +48,9 @@ make %{?jobs:-j%jobs}
 %install
 %make_install
 
+mkdir -p %{buildroot}/usr/share/license
+cp LICENSE %{buildroot}/usr/share/license/%{name}
+
 
 %post
 
@@ -72,6 +75,7 @@ chsmack -a 'app-svc::db' /opt/dbspace/.appsvc.db-journal
 /usr/bin/appsvc_test
 %{_libdir}/libappsvc.so.0
 %{_libdir}/libappsvc.so.0.1.0
+/usr/share/license/%{name}
 
 %files devel
 %defattr(-,root,root,-)
