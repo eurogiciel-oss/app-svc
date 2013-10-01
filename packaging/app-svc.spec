@@ -1,6 +1,6 @@
 Name:	    app-svc
 Summary:    Application Service
-Version: 0.1.50
+Version: 0.1.51
 Release:    1
 Group:      Application Framework/Service
 License:    Apache-2.0

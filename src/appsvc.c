@@ -65,6 +65,7 @@ typedef struct _appsvc_resolve_info_t{
 	char *m_type;
 	char *s_type;
 	char *category;
+	char *win_id;
 	int mime_set;
 }appsvc_resolve_info_t;
 
@@ -230,21 +231,21 @@ static int __get_resolve_info(bundle *b, appsvc_resolve_info_t *info)
 	if(info->uri) {
 		if(strncmp(info->uri,"/",1) == 0){
 			if(!info->mime) {
-				info->mime = malloc(MAX_MIME_STR_SIZE);
+				info->origin_mime = info->mime = malloc(MAX_MIME_STR_SIZE);
 				aul_get_mime_from_file(info->uri, info->mime, MAX_MIME_STR_SIZE);
 				info->mime_set = 1;
 			}
 			info->uri = NULL;			
 		} else if(strncmp(info->uri,"file:/",6)==0){
 			if(!info->mime) {
-				info->mime = malloc(MAX_MIME_STR_SIZE);
+				info->origin_mime = info->mime = malloc(MAX_MIME_STR_SIZE);
 				aul_get_mime_from_file(&info->uri[5], info->mime, MAX_MIME_STR_SIZE);
 				info->mime_set = 1;
 			}
 			info->uri = NULL;
 		} else if(strncmp(info->uri,"file:///",8) == 0){
 			if(!info->mime) {
-				info->mime = malloc(MAX_MIME_STR_SIZE);
+				info->origin_mime = info->mime = malloc(MAX_MIME_STR_SIZE);
 				aul_get_mime_from_file(&info->uri[7], info->mime, MAX_MIME_STR_SIZE);	
 				info->mime_set = 1;
 			}
@@ -298,8 +299,7 @@ static int __get_resolve_info(bundle *b, appsvc_resolve_info_t *info)
 			strncpy(info->s_type, "%", MAX_LOCAL_BUFSZ-1);	
 		}
 
-		if(!info->mime_set)
-			info->mime = malloc(MAX_MIME_STR_SIZE);
+		info->mime = malloc(MAX_MIME_STR_SIZE);
 		snprintf(info->mime, MAX_MIME_STR_SIZE-1, "%s/%s", info->m_type, info->s_type);
 	}
 
@@ -320,6 +320,8 @@ static int __free_resolve_info_data(appsvc_resolve_info_t *info)
 		free(info->s_type);
 	if (info->uri_r_info)
 		free(info->uri_r_info);
+	if (info->mime_set)
+		free(info->origin_mime);
 	
 	return 0;
 }
@@ -996,6 +998,18 @@ static Eina_Bool __transient_cb(void *data, int type, void *event)
 	return ECORE_CALLBACK_RENEW;
 }
 
+int __aul_subapp_cb(void *data)
+{
+	appsvc_transient_cb_info_t*  cb_info;
+
+	cb_info = (appsvc_transient_cb_info_t*) data;
+
+	cb_info->cb_func(cb_info->data);
+	ecore_main_loop_quit();
+
+	return 0;
+}
+
 SLPAPI int appsvc_allow_transient_app(bundle *b, Ecore_X_Window id)
 {
 	char win_id[MAX_LOCAL_BUFSZ];
@@ -1036,7 +1050,13 @@ SLPAPI int appsvc_request_transient_app(bundle *b, Ecore_X_Window callee_id, app
 	info->data = data;
 
 	ecore_event_handler_add(ECORE_X_EVENT_WINDOW_DESTROY, __transient_cb, info);
+	aul_set_subapp(__aul_subapp_cb, info);
 
 	return 0;
+}
+
+SLPAPI int appsvc_subapp_terminate_request_pid(int pid)
+{
+	return aul_subapp_terminate_request_pid(pid);
 }
 
