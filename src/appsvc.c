@@ -227,6 +227,7 @@ static int __get_resolve_info(bundle *b, appsvc_resolve_info_t *info)
 	info->origin_mime = info->mime = (char *)appsvc_get_mime(b);
 	info->pkgname = (char *)appsvc_get_pkgname(b);
 	info->category = (char *)appsvc_get_category(b);
+	info->win_id = (char *)bundle_get_val(b, APP_SVC_K_WIN_ID);
 
 	if(info->uri) {
 		if(strncmp(info->uri,"/",1) == 0){
@@ -571,7 +572,6 @@ static int __get_list_with_category(char *category, GSList **pkg_list)
 	GSList *app_list = NULL;
 	GSList *iter = NULL;
 	char *list_item = NULL;
-	int match;
 
 	ret = pkgmgrinfo_appinfo_filter_create(&handle);
 	ret = pkgmgrinfo_appinfo_filter_add_string(handle, PMINFO_APPINFO_PROP_APP_CATEGORY, category);
@@ -591,6 +591,69 @@ static int __get_list_with_category(char *category, GSList **pkg_list)
 	g_slist_free(*pkg_list);
 
 	*pkg_list = app_list;
+
+	return 0;
+}
+
+static int __appid_compare(gconstpointer data1, gconstpointer data2)
+{
+	char *a = (char *)data1;
+	char *b = (char *)data2;
+	return strcmp(a,b);
+}
+
+static int __get_list_with_submode(char *win_id, GSList **pkg_list)
+{
+	int ret;
+	GSList *iter = NULL;
+	char *appid = NULL;
+	GSList *find_item = NULL;
+	char *find_appid = NULL;
+	ail_appinfo_h handle;
+	char *submode_mainid = NULL;
+
+	for (iter = *pkg_list; iter != NULL; ) {
+		find_item = NULL;
+		submode_mainid = NULL;
+		appid = (char *)iter->data;
+		ret = ail_get_appinfo(appid, &handle);
+		SECURE_LOGD("ret %d, %s, %x", ret, appid, handle);
+		ret = ail_appinfo_get_str(handle, AIL_PROP_X_SLP_SUBMODEMAINID_STR, &submode_mainid);
+		SECURE_LOGD("appid(%s) submode_mainid(%s) win_id(%s)", appid, submode_mainid, win_id);
+		if(submode_mainid) {
+			if(win_id) {
+				find_item = g_slist_find_custom(*pkg_list, submode_mainid, __appid_compare);
+				if(find_item) {
+					find_appid = find_item->data;
+					if(find_item == g_slist_next(iter)) {
+						iter = g_slist_next(find_item);
+						*pkg_list = g_slist_remove(*pkg_list, find_appid);
+						free(find_appid);
+					} else {
+						iter = g_slist_next(iter);
+						*pkg_list = g_slist_remove(*pkg_list, find_appid);
+						free(find_appid);
+					}
+				}
+			} else {
+				find_item = g_slist_find_custom(*pkg_list, submode_mainid, __appid_compare);
+				if(find_item) {
+					iter = g_slist_next(iter);
+					*pkg_list = g_slist_remove(*pkg_list, appid);
+					free(appid);
+				}
+			}
+		}
+		ail_destroy_appinfo(handle);
+		if(!find_item) {
+			iter = g_slist_next(iter);
+		}
+	}
+
+	for (iter = *pkg_list; iter != NULL; iter = g_slist_next(iter)) {
+		appid = (char *)iter->data;
+		SECURE_LOGD("appid(%s)", appid);
+	}
 
 	return 0;
 }
@@ -651,6 +714,8 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 				__get_list_with_category(info.category, &pkg_list);
 			}
 
+			__get_list_with_submode(info.win_id, &pkg_list);
+
 			pkg_count = g_slist_length(pkg_list);
 			_D("pkg_count : %d", pkg_count);
 
@@ -697,6 +762,8 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 					__get_list_with_category(info.category, &pkg_list);
 				}
 
+				__get_list_with_submode(info.win_id, &pkg_list);
+
 				pkg_count = g_slist_length(pkg_list);
 				_D("pkg_count : %d", pkg_count);
 
@@ -738,6 +805,8 @@ SLPAPI int appsvc_run_service(bundle *b, int request_code, appsvc_res_fn cbfunc,
 		if(info.category) {
 			__get_list_with_category(info.category, &pkg_list);
 		}
+
+		__get_list_with_submode(info.win_id, &pkg_list);
 
 		pkg_count = g_slist_length(pkg_list);
 		_D("pkg_count : %d", pkg_count);
@@ -813,6 +882,8 @@ SLPAPI int appsvc_get_list(bundle *b, appsvc_info_iter_fn iter_fn, void *data)
 	if(info.category) {
 		__get_list_with_category(info.category, &pkg_list);
 	}
+
+	__get_list_with_submode(info.win_id, &pkg_list);
 
 	pkg_count = g_slist_length(pkg_list);
 	if (pkg_count == 0) {

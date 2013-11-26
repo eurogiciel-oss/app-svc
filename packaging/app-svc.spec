@@ -1,6 +1,6 @@
 Name:	    app-svc
 Summary:    Application Service
-Version: 0.1.51
+Version: 0.1.53
 Release:    1
 Group:      Application Framework/Service
 License:    Apache-2.0
@@ -52,6 +52,9 @@ make %{?jobs:-j%jobs}
 mkdir -p %{buildroot}/opt/dbspace
 sqlite3 %{buildroot}/opt/dbspace/.appsvc.db < data/appsvc_db.sql
 
+mkdir -p %{buildroot}/usr/share/license
+cp LICENSE %{buildroot}/usr/share/license/%{name}
+
 %post -p /sbin/ldconfig
 
 %postun -p /sbin/ldconfig
@@ -65,6 +68,7 @@ sqlite3 %{buildroot}/opt/dbspace/.appsvc.db < data/appsvc_db.sql
 /usr/bin/appsvc_test
 %{_libdir}/libappsvc.so.0
 %{_libdir}/libappsvc.so.0.1.0
+/usr/share/license/%{name}
 
 %files devel
 %defattr(-,root,root,-)
