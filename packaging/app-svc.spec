@@ -1,3 +1,6 @@
+%bcond_with x
+%bcond_with wayland
+
 Name:	    app-svc
 Summary:    Application Service
 Version: 0.1.53
@@ -13,7 +16,10 @@ BuildRequires: cmake
 BuildRequires: sqlite3
 BuildRequires: pkgconfig(dlog)
 BuildRequires: pkgconfig(ecore) 
+%if %{with x}
 BuildRequires: pkgconfig(x11)
+BuildRequires:  pkgconfig(ecore-x)
+%endif
 BuildRequires: pkgconfig(libprivilege-control)
 BuildRequires: pkgconfig(bundle)
 BuildRequires: pkgconfig(dbus-glib-1)
@@ -40,9 +46,14 @@ Requires:   %{name} = %{version}-%{release}
 %setup -q
 cp %{SOURCE1001} .
 
-
 %build
-%cmake .
+%cmake . \
+%if %{with wayland} && !%{with x}
+-Dwith_wayland=TRUE
+%else
+-Dwith_x=TRUE
+%endif
+
 make %{?jobs:-j%jobs}
 
 %install

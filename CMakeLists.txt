@@ -22,8 +22,19 @@ MESSAGE("Build type: ${CMAKE_BUILD_TYPE}")
 # Set required packages
 INCLUDE(FindPkgConfig)
 
-pkg_check_modules(pkgs REQUIRED dlog ecore x11 libprivilege-control aul)
-pkg_check_modules(libpkgs REQUIRED dlog bundle dbus-glib-1 ail xdgmime aul glib-2.0 ecore-x ecore libsoup-2.4 iniparser pkgmgr-info)
+SET(APPSVC_PKGS_CHECK_MODULES "dlog ecore libprivilege-control aul")
+SET(APPSVC_LIBPKGS_CHECK_MODULES "dlog bundle dbus-glib-1 ail xdgmime aul glib-2.0 ecore libsoup-2.4 iniparser pkgmgr-info")
+
+IF (with_x)
+pkg_check_modules(pkgs REQUIRED ${APPSVC_PKGS_CHECK_MODULES} x11)
+pkg_check_modules(libpkgs REQUIRED ${APPSVC_LIBPKGS_CHECK_MODULES} ecore-x)
+ENDIF(with_x)
+
+IF (with_wayland)
+ADD_DEFINITIONS("-DWAYLAND")
+pkg_check_modules(pkgs REQUIRED ${APPSVC_PKGS_CHECK_MODULES})
+pkg_check_modules(libpkgs REQUIRED ${APPSVC_LIBPKGS_CHECK_MODULES})
+ENDIF (with_wayland)
 
 FIND_LIBRARY(LIB_DL dl)
 
