@@ -460,7 +460,7 @@ static char* __get_alias_appid(char *appid)
 		return NULL;
 
 	sprintf(key_string, "Alias:%s", appid);
-	val = iniparser_getstr(dic, key_string);
+	val = iniparser_getstring(dic, key_string, NULL);
 
 	_D("alias_id : %s", val);
 
