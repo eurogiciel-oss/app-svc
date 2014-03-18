@@ -24,13 +24,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include <glib.h>
+#include <tzplatform_config.h>
 
 #include "appsvc_db.h"
 #include "internal.h"
 
-
-#define SVC_DB_PATH	"/opt/dbspace/.appsvc.db"
-#define APP_INFO_DB_PATH	"/opt/dbspace/.app_info.db"
+#define SVC_DB_PATH	tzplatform_mkpath(TZ_SYS_DB, ".appsvc.db")
+#define APP_INFO_DB_PATH	tzplatform_mkpath(TZ_SYS_DB, ".app_info.db")
 
 #define QUERY_MAX_LEN	8192
 #define URI_MAX_LEN	4096

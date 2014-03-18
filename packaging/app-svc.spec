@@ -30,6 +30,7 @@ BuildRequires: pkgconfig(glib-2.0)
 BuildRequires: pkgconfig(libsoup-2.4)
 BuildRequires: pkgconfig(iniparser)
 BuildRequires: pkgconfig(pkgmgr-info)
+BuildRequires: pkgconfig(libtzplatform-config)
 
 
 %description
@@ -60,8 +61,8 @@ make %{?jobs:-j%jobs}
 %make_install
 
 # Create database
-mkdir -p %{buildroot}/opt/dbspace
-sqlite3 %{buildroot}/opt/dbspace/.appsvc.db < data/appsvc_db.sql
+mkdir -p %{buildroot}%{TZ_SYS_DB}
+sqlite3 %{buildroot}%{TZ_SYS_DB}/.appsvc.db < data/appsvc_db.sql
 
 mkdir -p %{buildroot}/usr/share/license
 cp LICENSE %{buildroot}/usr/share/license/%{name}
@@ -74,8 +75,8 @@ cp LICENSE %{buildroot}/usr/share/license/%{name}
 %defattr(-,root,root,-)
 %manifest %{name}.manifest
 %license LICENSE
-%config(noreplace) %verify(not md5 mtime size) %attr(664,root,app) /opt/dbspace/.appsvc.db
-%config(noreplace) %verify(not md5 mtime size) %attr(664,root,app) /opt/dbspace/.appsvc.db-journal
+%config(noreplace) %verify(not md5 mtime size) %attr(664,root,%{TZ_SYS_USER_GROUP}) %{TZ_SYS_DB}/.appsvc.db
+%config(noreplace) %verify(not md5 mtime size) %attr(664,root,%{TZ_SYS_USER_GROUP}) %{TZ_SYS_DB}/.appsvc.db-journal
 /usr/bin/appsvc_test
 %{_libdir}/libappsvc.so.0
 %{_libdir}/libappsvc.so.0.1.0

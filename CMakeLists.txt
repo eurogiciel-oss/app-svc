@@ -23,7 +23,7 @@ MESSAGE("Build type: ${CMAKE_BUILD_TYPE}")
 INCLUDE(FindPkgConfig)
 
 SET(APPSVC_PKGS_CHECK_MODULES "dlog ecore libprivilege-control aul")
-SET(APPSVC_LIBPKGS_CHECK_MODULES "dlog bundle dbus-glib-1 ail xdgmime aul glib-2.0 ecore libsoup-2.4 iniparser pkgmgr-info")
+SET(APPSVC_LIBPKGS_CHECK_MODULES "dlog bundle dbus-glib-1 ail xdgmime aul glib-2.0 ecore libsoup-2.4 iniparser pkgmgr-info libtzplatform-config")
 
 IF (with_x)
 pkg_check_modules(pkgs REQUIRED ${APPSVC_PKGS_CHECK_MODULES} x11)

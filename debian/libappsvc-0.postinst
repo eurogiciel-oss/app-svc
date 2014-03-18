@@ -1,18 +1,19 @@
 #!/bin/sh
+source /etc/tizen-platform.conf
 
-mkdir -p /opt/dbspace
-sqlite3 /opt/dbspace/.appsvc.db < /opt/share/appsvc_db.sql
+mkdir -p $TZ_SYS_DB
+sqlite3 $TZ_SYS_DB/.appsvc.db < $TZ_SYS_SHARE/appsvc_db.sql
 rm -rf /opt/share/appsvc_db.sql
 
 if [ "${USER}" = "root" ]
 then
 	chown root:root /usr/lib/libappsvc.so.0.1.0
-	chown root:5000 /opt/dbspace/.appsvc.db
-	chown root:5000 /opt/dbspace/.appsvc.db-journal
+	chown root:$TZ_SYS_USER_GROUP $TZ_SYS_DB/.appsvc.db
+	chown root:$TZ_SYS_USER_GROUP $TZ_SYS_DB/.appsvc.db-journal
 fi
 
 chmod 644 /usr/lib/libappsvc.so.0.1.0
-chmod 664 /opt/dbspace/.appsvc.db
-chmod 664 /opt/dbspace/.appsvc.db-journal
+chmod 664 $TZ_SYS_DB/.appsvc.db
+chmod 664 $TZ_SYS_DB/.appsvc.db-journal
 
 #chmod 1777 /opt/share/miregex	# Set directory to be writable for other accounts
