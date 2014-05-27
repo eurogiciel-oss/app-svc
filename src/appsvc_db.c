@@ -42,6 +42,22 @@ static sqlite3 *svc_db = NULL;
 static sqlite3 *app_info_db = NULL;
 
 
+static char* getUserSvcDB(void)
+{
+       if(getuid())
+               return tzplatform_mkpath(TZ_USER_HOME, ".applications/dbspace/.appsvc.db");
+       else
+               return SVC_DB_PATH;
+}
+
+
+static char* getUserAppDB(void)
+{
+       if(getuid())
+               return tzplatform_mkpath(TZ_USER_HOME, ".applications/dbspace/.app_info.db");
+       else
+               return APP_INFO_DB_PATH;
+}
 
 /**
  * db initialize
@@ -55,7 +71,7 @@ static int __init(void)
 		return 0;
 	}
 
-	rc = sqlite3_open(SVC_DB_PATH, &svc_db);
+	rc = sqlite3_open(getUserSvcDB(), &svc_db);
 	if(rc) {
 		_E("Can't open database: %s", sqlite3_errmsg(svc_db));
 		goto err;
@@ -150,7 +166,7 @@ static int __init_app_info_db(void)
 		return 0;
 	}
 
-	rc = sqlite3_open(APP_INFO_DB_PATH, &app_info_db);
+	rc = sqlite3_open(getUserAppDB(), &app_info_db);
 	if(rc) {
 		_E("Can't open database: %s", sqlite3_errmsg(app_info_db));
 		goto err;
